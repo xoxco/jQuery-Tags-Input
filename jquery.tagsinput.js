@@ -71,7 +71,12 @@
 	
 		};
 	
-	
+	// clear all existing tags and import new ones from a string
+	jQuery.fn.importTags = function(str) {
+		$('#'+id+'_tagsinput .tag').remove();
+		jQuery.fn.tagsInput.importTags(this,str);
+	}
+		
 	jQuery.fn.tagsInput = function(options) { 
 	
 		var settings = jQuery.extend({defaultText:'add a tag',width:'300px',height:'100px','hide':true,'delimiter':',',autocomplete:{selectFirst:false}},options);
