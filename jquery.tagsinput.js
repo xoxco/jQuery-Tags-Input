@@ -1,6 +1,6 @@
 /*
 
-	jQuery Tags Input Plugin 1.2.1
+	jQuery Tags Input Plugin 1.2.2
 	
 	Copyright (c) 2010 XOXCO, Inc
 	
