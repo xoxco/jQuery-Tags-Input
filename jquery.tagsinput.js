@@ -30,11 +30,12 @@
 				}
 
 				value = jQuery.trim(value);
-        if (options.unique) {
-          skipTag = $(tagslist).tagExist(value);
-        } else {
-          skipTag = false; 
-        }
+		
+				if (options.unique) {
+					skipTag = $(tagslist).tagExist(value);
+				} else {
+					skipTag = false; 
+				}
 
 				if (value !='' && skipTag != true) { 
 					
@@ -78,15 +79,15 @@
 	
 		};
 	
-  jQuery.fn.tagExist = function(val) {
-
-    if (jQuery.inArray(val, $(this)) == -1) {
-      return false; /* Cannot find value in array */
-    } else {
-      return true; /* Value found */
-    }
-  };
-
+	jQuery.fn.tagExist = function(val) {
+	
+		if (jQuery.inArray(val, $(this)) == -1) {
+		  return false; /* Cannot find value in array */
+		} else {
+		  return true; /* Value found */
+		}
+	};
+	
 	// clear all existing tags and import new ones from a string
 	jQuery.fn.importTags = function(str) {
 		$('#'+id+'_tagsinput .tag').remove();
@@ -95,7 +96,7 @@
 		
 	jQuery.fn.tagsInput = function(options) { 
 	
-		var settings = jQuery.extend({defaultText:'add a tag',width:'300px',height:'100px','hide':true,'delimiter':',',autocomplete:{selectFirst:false}},options);
+		var settings = jQuery.extend({defaultText:'add a tag',width:'300px',height:'100px','hide':true,'delimiter':',',autocomplete:{selectFirst:false},'unique':true},options);
 	
 		this.each(function() { 
 			if (settings.hide) { 
