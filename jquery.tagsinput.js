@@ -28,8 +28,13 @@
 				if (tagslist[0] == '') { 
 					tagslist = new Array();
 				}
+
 				value = jQuery.trim(value);
-				if (value !='') { 
+        if (options.unique) {
+          skipTag = $(tagslist).tagExist(value);
+        } 
+
+				if (value !='' && skipTag != true) { 
 					
 					$('<span class="tag">'+value + '&nbsp;&nbsp;<a href="#" title="Remove tag" onclick="return $(\'#'+id + '\').removeTag(\'' + escape(value) + '\');">x</a></span>').insertBefore('#'+id+'_addTag');
 					tagslist.push(value);
@@ -71,6 +76,15 @@
 	
 		};
 	
+  jQuery.fn.tagExist = function(val) {
+
+    if (jQuery.inArray(val, $(this)) == -1) {
+      return false; /* Cannot find value in array */
+    } else {
+      return true; /* Value found */
+    }
+  };
+
 	// clear all existing tags and import new ones from a string
 	jQuery.fn.importTags = function(str) {
 		$('#'+id+'_tagsinput .tag').remove();
@@ -121,7 +135,7 @@
 			$(data.fake_input).bind('keypress',data,function(event) { 
 				if (event.which==event.data.delimiter.charCodeAt(0) || event.which==13) { 
 				
-					$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:true});
+					$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:true,unique:(settings.unique)});
 					return false;
 				}
 			});
@@ -138,7 +152,7 @@
 				$(data.fake_input).autocomplete(settings.autocomplete_url,settings.autocomplete).bind('result',data,function(event,data,formatted) { 
 					if (data) {
 						d = data + "";	
-						$(event.data.real_input).addTag(d,{focus:true});
+						$(event.data.real_input).addTag(d,{focus:true,unique:(settings.unique)});
 					}
 				});;
 				
@@ -162,7 +176,7 @@
 						var d = $(this).attr('default');
 						if ($(event.data.fake_input).val()!='' && $(event.data.fake_input).val()!=d) { 
 							event.preventDefault();
-							$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:true});
+							$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:true,unique:(settings.unique)});
 						} else {
 							$(event.data.fake_input).val($(event.data.fake_input).attr('default'));
 							$(event.data.fake_input).css('color','#666666');
@@ -197,5 +211,6 @@
 				$(obj).addTag(tags[i],{focus:false});
 			}
 		};
+
 			
 })(jQuery);
