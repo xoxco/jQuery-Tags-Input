@@ -32,7 +32,9 @@
 				value = jQuery.trim(value);
         if (options.unique) {
           skipTag = $(tagslist).tagExist(value);
-        } 
+        } else {
+          skipTag = false; 
+        }
 
 				if (value !='' && skipTag != true) { 
 					
