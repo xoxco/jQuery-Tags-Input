@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>jQuery Tags Input Test Page</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />	
+	<link rel="stylesheet" type="text/css" href="jquery.tagsinput.css" />
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+	<script type="text/javascript" src="jquery.tagsinput.js"></script>
+	
+	
+	<script type="text/javascript">
+		
+		$(function() {
+			$('input.tags').tagsInput();		
+		});
+	
+	</script>
+	
+</head>
+<body>
+	<header>
+		jQuery Tags Input!
+	</header>	
+	<section>	
+		<form>
+			<input id="tags_1" type="text" class="tags" value="foo,bar,baz,roffle" />
+		</form>
+	</section>
+
+</body>
