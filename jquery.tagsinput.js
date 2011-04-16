@@ -96,7 +96,7 @@
 		
 	jQuery.fn.tagsInput = function(options) { 
 	
-		var settings = jQuery.extend({defaultText:'add a tag',width:'300px',height:'100px','hide':true,'delimiter':',',autocomplete:{selectFirst:false},'unique':true},options);
+		var settings = jQuery.extend({defaultText:'add a tag',minChars:0,width:'300px',height:'100px','hide':true,'delimiter':',',autocomplete:{selectFirst:false},'unique':true},options);
 	
 		this.each(function() { 
 			if (settings.hide) { 
@@ -134,16 +134,6 @@
 				$(event.data.fake_input).focus();
 			});
 		
-			// if user types a comma, create a new tag
-			$(data.fake_input).bind('keypress',data,function(event) { 
-				if (event.which==event.data.delimiter.charCodeAt(0) || event.which==13) { 
-				
-					$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:true,unique:(settings.unique)});
-					return false;
-				}
-			});
-					
-			
 			$(data.fake_input).bind('focus',data,function(event) {
 				if ($(event.data.fake_input).val()==$(event.data.fake_input).attr('default')) { 
 					$(event.data.fake_input).val('');
@@ -151,13 +141,13 @@
 				$(event.data.fake_input).css('color','#000000');		
 			});
 					
-			if (settings.autocomplete_url != undefined) { 
-				$(data.fake_input).autocomplete(settings.autocomplete_url,settings.autocomplete).bind('result',data,function(event,data,formatted) { 
-					if (data) {
-						d = data + "";	
-						$(event.data.real_input).addTag(d,{focus:true,unique:(settings.unique)});
+			if (settings.autocomplete_url != undefined) {
+				$(data.fake_input).autocomplete(settings.autocomplete_url,settings.autocomplete).bind('result',data,function(event,data,formatted) {
+					if (data) 
+					{
+						$(event.data.real_input).addTag(formatted,{focus:true,unique:(settings.unique)});
 					}
-				});;
+				});
 				
 		
 				$(data.fake_input).bind('blur',data,function(event) { 
@@ -172,7 +162,6 @@
 	
 		
 			} else {
-	
 					// if a user tabs out of the field, create a new tag
 					// this is only available if autocomplete is not used.
 					$(data.fake_input).bind('blur',data,function(event) { 
@@ -188,8 +177,17 @@
 					});
 			
 			}
-			
+			// if user types a comma, create a new tag
+			$(data.fake_input).bind('keypress',data,function(event) { 
+				if (event.which==event.data.delimiter.charCodeAt(0) || event.which==13 ) { 
+					if( event.data.minChars <= $(event.data.fake_input).val().length && (!event.data.maxChars || (event.data.maxChars >= $(event.data.fake_input).val().length)) )
+						$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:true,unique:(settings.unique)});
+
+					return false;
+				}
+			});
 			$(data.fake_input).blur();
+			return false;
 		});
 			
 		return this;
