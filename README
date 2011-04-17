@@ -57,6 +57,8 @@ $(selector).tagsInput({
    'autocomplete': { option: value, option: value},
    'height':'100px',
    'width':'300px',
-   'defaultText':'add a tag'
+   'defaultText':'add a tag',
+   'minChars' : 0,
+   'maxChars' : 0 //if not provided there is no limit
 });
 
