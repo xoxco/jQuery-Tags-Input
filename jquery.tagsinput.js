@@ -1,6 +1,6 @@
 /*
 
-	jQuery Tags Input Plugin 1.2.2
+	jQuery Tags Input Plugin 1.2.3
 	
 	Copyright (c) 2010 XOXCO, Inc
 	
@@ -149,12 +149,13 @@
 					}
 				});
 				
-		
-				$(data.fake_input).bind('blur',data,function(event) { 
-					if ($(event.data.fake_input).val() != $(event.data.fake_input).attr('default')) {
-						$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:false});						
+				$(data.fake_input).bind('blur',data,function(event) {
+					if( $('.ac_results').is(':visible') ) return false;
+					if ( $(event.data.fake_input).val() != $(event.data.fake_input).attr('default')) {
+						if((event.data.minChars <= $(event.data.fake_input).val().length) && (!event.data.maxChars || (event.data.maxChars >= $(event.data.fake_input).val().length)))
+							$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:false,unique:(settings.unique)});						
 					}
-
+					
 					$(event.data.fake_input).val($(event.data.fake_input).attr('default'));
 					$(event.data.fake_input).css('color','#666666');
 					return false;
@@ -167,8 +168,8 @@
 					$(data.fake_input).bind('blur',data,function(event) { 
 						var d = $(this).attr('default');
 						if ($(event.data.fake_input).val()!='' && $(event.data.fake_input).val()!=d) { 
-							event.preventDefault();
-							$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:true,unique:(settings.unique)});
+							if( (event.data.minChars <= $(event.data.fake_input).val().length) && (!event.data.maxChars || (event.data.maxChars >= $(event.data.fake_input).val().length)) )
+								$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:true,unique:(settings.unique)});
 						} else {
 							$(event.data.fake_input).val($(event.data.fake_input).attr('default'));
 							$(event.data.fake_input).css('color','#666666');
@@ -179,10 +180,10 @@
 			}
 			// if user types a comma, create a new tag
 			$(data.fake_input).bind('keypress',data,function(event) { 
-				if (event.which==event.data.delimiter.charCodeAt(0) || event.which==13 ) { 
-					if( event.data.minChars <= $(event.data.fake_input).val().length && (!event.data.maxChars || (event.data.maxChars >= $(event.data.fake_input).val().length)) )
+				if (event.which==event.data.delimiter.charCodeAt(0) || event.which==13 ) {
+					if( (event.data.minChars <= $(event.data.fake_input).val().length) && (!event.data.maxChars || (event.data.maxChars >= $(event.data.fake_input).val().length)) )
 						$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:true,unique:(settings.unique)});
-
+					
 					return false;
 				}
 			});
