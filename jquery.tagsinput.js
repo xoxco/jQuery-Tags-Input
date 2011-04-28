@@ -64,6 +64,7 @@
 		
 	jQuery.fn.removeTag = function(value) { 
 			
+			value = unescape(value);
 			this.each(function() { 
 				id = $(this).attr('id');
 	
@@ -73,7 +74,7 @@
 				$('#'+id+'_tagsinput .tag').remove();
 				str = '';
 				for (i=0; i< old.length; i++) { 
-					if (escape(old[i])!=value) { 
+					if (old[i]!=value) { 
 						str = str + delimiter[id] +old[i];
 					}
 				}
