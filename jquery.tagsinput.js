@@ -17,6 +17,7 @@
 (function($) {
 
 	var delimiter = new Array();
+	var tags_callbacks = new Array();
 	
 	jQuery.fn.addTag = function(value,options) {
 		
