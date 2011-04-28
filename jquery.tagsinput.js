@@ -21,7 +21,6 @@
 	
 	jQuery.fn.addTag = function(value,options) {
 		
-			var options = jQuery.extend({focus:false},options);
 			var options = jQuery.extend({focus:false,callback:true},options);
 			this.each(function() { 
 				id = $(this).attr('id');
@@ -127,6 +126,7 @@
 	
 	
 			delimiter[id] = data.delimiter;
+			
 			if (settings.onAddTag || settings.onRemoveTag) {
 				tags_callbacks[id] = new Array();
 				tags_callbacks[id]['onAddTag'] = settings.onAddTag;
