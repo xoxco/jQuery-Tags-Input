@@ -11,8 +11,18 @@
 	
 	<script type="text/javascript">
 		
+		function onAddTag(tag) {
+			alert("Added a tag: " + tag);
+		}
+		function onRemoveTag(tag) {
+			alert("Removed a tag: " + tag);
+		}
+		
 		$(function() {
-			$('input.tags').tagsInput();		
+			$('input.tags').tagsInput();
+			
+// Uncomment this line to see the callback functions in action
+//			$('input.tags').tagsInput({onAddTag:onAddTag,onRemoveTag:onRemoveTag});		
 		});
 	
 	</script>
