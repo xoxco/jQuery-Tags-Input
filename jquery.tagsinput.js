@@ -21,6 +21,7 @@
 	jQuery.fn.addTag = function(value,options) {
 		
 			var options = jQuery.extend({focus:false},options);
+			var options = jQuery.extend({focus:false,callback:true},options);
 			this.each(function() { 
 				id = $(this).attr('id');
 	
