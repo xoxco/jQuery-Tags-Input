@@ -228,6 +228,7 @@
 			var tags = val.split(delimiter[id]);
 			for (i=0; i<tags.length; i++) { 
 				$(obj).addTag(tags[i],{focus:false});
+				$(obj).addTag(tags[i],{focus:false,callback:false});
 			}
 		};
 
