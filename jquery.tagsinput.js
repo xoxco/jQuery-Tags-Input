@@ -127,6 +127,11 @@
 	
 	
 			delimiter[id] = data.delimiter;
+			if (settings.onAddTag || settings.onRemoveTag) {
+				tags_callbacks[id] = new Array();
+				tags_callbacks[id]['onAddTag'] = settings.onAddTag;
+				tags_callbacks[id]['onRemoveTag'] = settings.onRemoveTag;
+			}
 	
 			$('<div id="'+id+'_tagsinput" class="tagsinput"><div id="'+id+'_addTag"><input id="'+id+'_tag" value="" default="'+settings.defaultText+'" /></div><div class="tags_clear"></div></div>').insertAfter(this);
 	
