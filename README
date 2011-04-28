@@ -50,6 +50,10 @@ You can add and remove tags by calling the addTag() and removeTag() functions.
 $('#tags').addTag('foo');
 $('#tags').removeTag('bar');
 
+If additional functionality is required when a tag is added or removed, you may specify
+callback functions via the onAddTag and onRemoveTag parameters.  Both functions should
+accept a single tag as the parameter.
+
 Options
 
 $(selector).tagsInput({
@@ -58,6 +62,8 @@ $(selector).tagsInput({
    'height':'100px',
    'width':'300px',
    'defaultText':'add a tag',
+   'onAddTag':callback_function,
+   'onRemoveTag':callback_function,
    'minChars' : 0,
    'maxChars' : 0 //if not provided there is no limit
 });
