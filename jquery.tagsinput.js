@@ -107,7 +107,7 @@
 		
 	jQuery.fn.tagsInput = function(options) { 
 	
-		var settings = jQuery.extend({defaultText:'add a tag',minChars:0,width:'300px',height:'100px','hide':true,'delimiter':',',autocomplete:{selectFirst:false},'unique':true},options);
+		var settings = jQuery.extend({interactive:true,defaultText:'add a tag',minChars:0,width:'300px',height:'100px','hide':true,'delimiter':',',autocomplete:{selectFirst:false},'unique':true},options);
 	
 		this.each(function() { 
 			if (settings.hide) { 
@@ -133,78 +133,86 @@
 				tags_callbacks[id]['onRemoveTag'] = settings.onRemoveTag;
 			}
 	
-			$('<div id="'+id+'_tagsinput" class="tagsinput"><div id="'+id+'_addTag"><input id="'+id+'_tag" value="" default="'+settings.defaultText+'" /></div><div class="tags_clear"></div></div>').insertAfter(this);
+			var markup = '<div id="'+id+'_tagsinput" class="tagsinput"><div id="'+id+'_addTag">';
+			
+			if (settings.interactive) {
+				markup = markup + '<input id="'+id+'_tag" value="" data-default="'+settings.defaultText+'" />';
+			}
+			
+			markup = markup + '</div><div class="tags_clear"></div></div>';
+			
+			$(markup).insertAfter(this);
+
 	
 			$(data.holder).css('width',settings.width);
 			$(data.holder).css('height',settings.height);
 	
-		
 			if ($(data.real_input).val()!='') { 
 				jQuery.fn.tagsInput.importTags($(data.real_input),$(data.real_input).val());
-			} else {
-				$(data.fake_input).val($(data.fake_input).attr('default'));
-				$(data.fake_input).css('color','#666666');				
-			}
+			}		
+			if (settings.interactive) { 
+				$(data.fake_input).val($(data.fake_input).attr('data-default'));
+				$(data.fake_input).css('color','#666666');		
 		
-	
-			$(data.holder).bind('click',data,function(event) {
-				$(event.data.fake_input).focus();
-			});
-		
-			$(data.fake_input).bind('focus',data,function(event) {
-				if ($(event.data.fake_input).val()==$(event.data.fake_input).attr('default')) { 
-					$(event.data.fake_input).val('');
-				}
-				$(event.data.fake_input).css('color','#000000');		
-			});
-					
-			if (settings.autocomplete_url != undefined) {
-				$(data.fake_input).autocomplete(settings.autocomplete_url,settings.autocomplete).bind('result',data,function(event,data,formatted) {
-					if (data) 
-					{
-						$(event.data.real_input).addTag(formatted,{focus:true,unique:(settings.unique)});
-					}
+				$(data.holder).bind('click',data,function(event) {
+					$(event.data.fake_input).focus();
 				});
-				
-				$(data.fake_input).bind('blur',data,function(event) {
-					if( $('.ac_results').is(':visible') ) return false;
-					if ( $(event.data.fake_input).val() != $(event.data.fake_input).attr('default')) {
-						if((event.data.minChars <= $(event.data.fake_input).val().length) && (!event.data.maxChars || (event.data.maxChars >= $(event.data.fake_input).val().length)))
-							$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:false,unique:(settings.unique)});						
+			
+				$(data.fake_input).bind('focus',data,function(event) {
+					if ($(event.data.fake_input).val()==$(event.data.fake_input).attr('data-default')) { 
+						$(event.data.fake_input).val('');
 					}
-					
-					$(event.data.fake_input).val($(event.data.fake_input).attr('default'));
-					$(event.data.fake_input).css('color','#666666');
-					return false;
+					$(event.data.fake_input).css('color','#000000');		
 				});
-	
-		
-			} else {
-					// if a user tabs out of the field, create a new tag
-					// this is only available if autocomplete is not used.
-					$(data.fake_input).bind('blur',data,function(event) { 
-						var d = $(this).attr('default');
-						if ($(event.data.fake_input).val()!='' && $(event.data.fake_input).val()!=d) { 
-							if( (event.data.minChars <= $(event.data.fake_input).val().length) && (!event.data.maxChars || (event.data.maxChars >= $(event.data.fake_input).val().length)) )
-								$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:true,unique:(settings.unique)});
-						} else {
-							$(event.data.fake_input).val($(event.data.fake_input).attr('default'));
-							$(event.data.fake_input).css('color','#666666');
+						
+				if (settings.autocomplete_url != undefined) {
+					$(data.fake_input).autocomplete(settings.autocomplete_url,settings.autocomplete).bind('result',data,function(event,data,formatted) {
+						if (data) 
+						{
+							$(event.data.real_input).addTag(formatted,{focus:true,unique:(settings.unique)});
 						}
+					});
+					
+					$(data.fake_input).bind('blur',data,function(event) {
+						if( $('.ac_results').is(':visible') ) return false;
+						if ( $(event.data.fake_input).val() != $(event.data.fake_input).attr('data-default')) {
+							if((event.data.minChars <= $(event.data.fake_input).val().length) && (!event.data.maxChars || (event.data.maxChars >= $(event.data.fake_input).val().length)))
+								$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:false,unique:(settings.unique)});						
+						}
+						
+						$(event.data.fake_input).val($(event.data.fake_input).attr('data-default'));
+						$(event.data.fake_input).css('color','#666666');
 						return false;
 					});
+		
 			
-			}
-			// if user types a comma, create a new tag
-			$(data.fake_input).bind('keypress',data,function(event) { 
-				if (event.which==event.data.delimiter.charCodeAt(0) || event.which==13 ) {
-					if( (event.data.minChars <= $(event.data.fake_input).val().length) && (!event.data.maxChars || (event.data.maxChars >= $(event.data.fake_input).val().length)) )
-						$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:true,unique:(settings.unique)});
-					
-					return false;
+				} else {
+						// if a user tabs out of the field, create a new tag
+						// this is only available if autocomplete is not used.
+						$(data.fake_input).bind('blur',data,function(event) { 
+							var d = $(this).attr('data-default');
+							if ($(event.data.fake_input).val()!='' && $(event.data.fake_input).val()!=d) { 
+								if( (event.data.minChars <= $(event.data.fake_input).val().length) && (!event.data.maxChars || (event.data.maxChars >= $(event.data.fake_input).val().length)) )
+									$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:true,unique:(settings.unique)});
+							} else {
+								$(event.data.fake_input).val($(event.data.fake_input).attr('data-default'));
+								$(event.data.fake_input).css('color','#666666');
+							}
+							return false;
+						});
+				
 				}
-			});
-			$(data.fake_input).blur();
+				// if user types a comma, create a new tag
+				$(data.fake_input).bind('keypress',data,function(event) { 
+					if (event.which==event.data.delimiter.charCodeAt(0) || event.which==13 ) {
+						if( (event.data.minChars <= $(event.data.fake_input).val().length) && (!event.data.maxChars || (event.data.maxChars >= $(event.data.fake_input).val().length)) )
+							$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:true,unique:(settings.unique)});
+						
+						return false;
+					}
+				});
+				$(data.fake_input).blur();
+			} // if settings.interactive
 			return false;
 		});
 			

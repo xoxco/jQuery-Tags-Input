@@ -54,6 +54,11 @@ If additional functionality is required when a tag is added or removed, you may 
 callback functions via the onAddTag and onRemoveTag parameters.  Both functions should
 accept a single tag as the parameter.
 
+If you do not want to provide a way to add tags, or you would prefer to provide an alternate
+interface for adding tags to the box, you may pass an false into the optional 'interactive' parameter. 
+The tags will still be rendered as per usual, and the addTag and removeTag functions will 
+operate as expected.   
+
 Options
 
 $(selector).tagsInput({
@@ -61,6 +66,7 @@ $(selector).tagsInput({
    'autocomplete': { option: value, option: value},
    'height':'100px',
    'width':'300px',
+   'interactive':true,
    'defaultText':'add a tag',
    'onAddTag':callback_function,
    'onRemoveTag':callback_function,
