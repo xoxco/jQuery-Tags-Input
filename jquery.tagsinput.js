@@ -50,6 +50,11 @@
 					} else {		
 						$('#'+id+'_tag').blur();
 					}
+					
+					if (options.callback && tags_callbacks[id] && tags_callbacks[id]['onAddTag']) {
+						var f = tags_callbacks[id]['onAddTag'];
+						f(value);
+					}
 				}
 				jQuery.fn.tagsInput.updateTagsField(this,tagslist);
 		
