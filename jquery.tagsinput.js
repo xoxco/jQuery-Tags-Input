@@ -108,7 +108,7 @@
 		
 	jQuery.fn.tagsInput = function(options) { 
 	
-		var settings = jQuery.extend({interactive:true,defaultText:'add a tag',minChars:0,width:'300px',height:'100px','hide':true,'delimiter':',',autocomplete:{selectFirst:false},'unique':true},options);
+		var settings = jQuery.extend({interactive:true,defaultText:'add a tag',minChars:0,width:'300px',height:'100px','hide':true,'delimiter':',',autocomplete:{selectFirst:false},'unique':true,removeWithBackspace:true},options);
 	
 		this.each(function() { 
 			if (settings.hide) { 
@@ -211,6 +211,18 @@
 						
 						return false;
 					}
+				});
+				//Delete last tag on backspace
+				data.removeWithBackspace && $(data.fake_input).bind('keyup', function(event)
+				{
+					if(event.keyCode == 8 && $(this).val() == '')
+					{
+						 var last_tag = $(this).closest('.tagsinput').find('.tag:last').text();
+						 var id = $(this).attr('id').replace(/_tag$/, '');
+						 last_tag = last_tag.replace(/[\s]+x$/, '');
+						 $('#' + id).removeTag(escape(last_tag));
+						 $(this).trigger('focus');
+					};
 				});
 				$(data.fake_input).blur();
 			} // if settings.interactive
