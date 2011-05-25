@@ -65,6 +65,12 @@ an alternate interface for adding tags to the box, you may pass an false into
 the optional 'interactive' parameter. The tags will still be rendered as per 
 usual, and the addTag and removeTag functions will operate as expected.   
 
+If you want a function to be called every time a tag is updated/deleted, set it
+as the 'onChange' option.
+
+By default, if the cursor is immediately after a tag, hitting backspace will 
+delete that tag. If you want to override this, set the 'removeWithBackspace' 
+option to false.
 
 Options
 
@@ -77,6 +83,8 @@ $(selector).tagsInput({
    'defaultText':'add a tag',
    'onAddTag':callback_function,
    'onRemoveTag':callback_function,
+   'onChange' : callback_function,
+   'removeWithBackspace' : true,
    'minChars' : 0,
    'maxChars' : 0 //if not provided there is no limit
 });
