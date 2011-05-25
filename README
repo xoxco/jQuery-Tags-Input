@@ -1,12 +1,15 @@
-jQuery Tags Input Plugin 1.2
+jQuery Tags Input Plugin 1.2.4
 
-Copyright (c) 2010 XOXCO, Inc
+Copyright (c) 2011 XOXCO, Inc
 
 Documentation for this plugin lives here:
 http://xoxco.com/clickable/jquery-tags-input
 
 Licensed under the MIT license:
 http://www.opensource.org/licenses/mit-license.php
+
+The git repository for this plugin can be found at:
+https://github.com/xoxco/jQuery-Tags-Input
 
 ben@xoxco.com
 ------------------------------------------------------
