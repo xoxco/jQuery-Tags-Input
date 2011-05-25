@@ -232,13 +232,10 @@
 	
 	};
 	
-	
 	$.fn.tagsInput.updateTagsField = function(obj,tagslist) { 
 		id = $(obj).attr('id');
 		$(obj).val(tagslist.join(delimiter[id]));
 	};
-	
-	
 	
 	$.fn.tagsInput.importTags = function(obj,val) {			
 		$(obj).val('');
@@ -254,5 +251,4 @@
 		}
 	};
 
-			
 })(jQuery);
