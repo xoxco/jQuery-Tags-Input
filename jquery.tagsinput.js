@@ -53,6 +53,12 @@
 						var f = tags_callbacks[id]['onAddTag'];
 						f(value);
 					}
+					if(tags_callbacks[id] && tags_callbacks[id]['onChange'])
+					{
+						var i = tagslist.length;
+						var f = tags_callbacks[id]['onChange'];
+						f($(this), tagslist[i]);
+					}					
 				}
 				$.fn.tagsInput.updateTagsField(this,tagslist);
 		
