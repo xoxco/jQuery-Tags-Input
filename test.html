@@ -19,7 +19,18 @@
 		}
 		
 		$(function() {
-			$('input.tags').tagsInput();
+			$('#tags_1').tagsInput();
+			$('#tags_2').tagsInput({
+				onChange: function(elem, elem_tags)
+				{
+					var languages = ['php','ruby','javascript'];
+					$('.tag', elem_tags).each(function()
+					{
+						if($(this).text().search(new RegExp('\\b(' + languages.join('|') + ')\\b')) >= 0)
+							$(this).css('background-color', 'yellow');
+					});
+				}
+			});
 			
 // Uncomment this line to see the callback functions in action
 //			$('input.tags').tagsInput({onAddTag:onAddTag,onRemoveTag:onRemoveTag});		
@@ -38,6 +49,9 @@
 	<section>	
 		<form>
 			<input id="tags_1" type="text" class="tags" value="foo,bar,baz,roffle" />
+			
+			<label>Technologies: (Programming languages in yellow)</label>
+			<input id="tags_2" type="text" class="tags" value="php,ios,javascript,ruby,android,kindle" />
 		</form>
 	</section>
 

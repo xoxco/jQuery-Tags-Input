@@ -20,7 +20,6 @@
 	var tags_callbacks = new Array();
 	
 	$.fn.addTag = function(value,options) {
-		
 			var options = jQuery.extend({focus:false,callback:true},options);
 			this.each(function() { 
 				id = $(this).attr('id');
@@ -63,7 +62,6 @@
 		};
 		
 	$.fn.removeTag = function(value) { 
-			
 			value = unescape(value);
 			this.each(function() { 
 				id = $(this).attr('id');
@@ -88,11 +86,9 @@
 			});
 					
 			return false;
-	
 		};
 	
 	$.fn.tagExist = function(val) {
-	
 		if (jQuery.inArray(val, $(this)) == -1) {
 		  return false; /* Cannot find value in array */
 		} else {
@@ -107,7 +103,6 @@
 	}
 		
 	$.fn.tagsInput = function(options) { 
-	
 		var settings = jQuery.extend({interactive:true,defaultText:'add a tag',minChars:0,width:'300px',height:'100px','hide':true,'delimiter':',',autocomplete:{selectFirst:false},'unique':true,removeWithBackspace:true},options);
 	
 		this.each(function() { 
@@ -247,7 +242,7 @@
 		if(tags_callbacks[id] && tags_callbacks[id]['onChange'])
 		{
 			var f = tags_callbacks[id]['onChange'];
-			f(obj);
+			f(obj, tags[i]);
 		}
 	};
 
