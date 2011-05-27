@@ -109,7 +109,7 @@
 	}
 		
 	$.fn.tagsInput = function(options) { 
-		var settings = jQuery.extend({interactive:true,defaultText:'add a tag',minChars:0,width:'300px',height:'100px','hide':true,'delimiter':',',autocomplete:{selectFirst:false},'unique':true,removeWithBackspace:true},options);
+		var settings = jQuery.extend({interactive:true,defaultText:'add a tag',minChars:0,width:'300px',height:'100px','hide':true,'delimiter':',',autocomplete:{},'unique':true,removeWithBackspace:true},options);
 	
 		this.each(function() { 
 			if (settings.hide) { 
@@ -168,7 +168,12 @@
 				});
 						
 				if (settings.autocomplete_url != undefined) {
-					$(data.fake_input).autocomplete(settings.autocomplete_url,settings.autocomplete).bind('result',data,function(event,data,formatted) {
+				  autocomplete_options = {source: settings.autocomplete_url}
+				  for (attrname in settings.autocomplete) { 
+				    autocomplete_options[attrname] = settings.autocomplete[attrname]; 
+				  }
+          
+					$(data.fake_input).autocomplete(autocomplete_options).bind('result',data,function(event,data,formatted) {
 						if (data) 
 						{
 							$(event.data.real_input).addTag(formatted,{focus:true,unique:(settings.unique)});
