@@ -18,12 +18,13 @@
 
 	var delimiter = new Array();
 	var tags_callbacks = new Array();
+	var gotAutoComplete = false;
 	
 	$.fn.addTag = function(value,options) {
 			var options = jQuery.extend({focus:false,callback:true},options);
 			this.each(function() { 
 				id = $(this).attr('id');
-	
+
 				var tagslist = $(this).val().split(delimiter[id]);
 				if (tagslist[0] == '') { 
 					tagslist = new Array();
@@ -118,8 +119,20 @@
 	}
 		
 	$.fn.tagsInput = function(options) { 
-		var settings = jQuery.extend({interactive:true,defaultText:'add a tag',minChars:0,width:'300px',height:'100px','hide':true,'delimiter':',',autocomplete:{selectFirst:false},'unique':true,removeWithBackspace:true},options);
-	
+    var settings = jQuery.extend({
+      interactive:true,
+      defaultText:'add a tag',
+      minChars:0,
+      width:'300px',
+      height:'100px',
+      'hide':true,
+      'delimiter':',',
+      autocomplete:{},
+      'unique':true,
+      removeWithBackspace:true,
+      placeholderColor:'#666666'
+    },options);
+
 		this.each(function() { 
 			if (settings.hide) { 
 				$(this).hide();				
@@ -163,7 +176,7 @@
 			}		
 			if (settings.interactive) { 
 				$(data.fake_input).val($(data.fake_input).attr('data-default'));
-				$(data.fake_input).css('color','#666666');		
+				$(data.fake_input).css('color',settings.placeholderColor);		
 		
 				$(data.holder).bind('click',data,function(event) {
 					$(event.data.fake_input).focus();
@@ -177,23 +190,34 @@
 				});
 						
 				if (settings.autocomplete_url != undefined) {
-					$(data.fake_input).autocomplete(settings.autocomplete_url,settings.autocomplete).bind('result',data,function(event,data,formatted) {
-						if (data) 
-						{
-							$(event.data.real_input).addTag(formatted,{focus:true,unique:(settings.unique)});
-						}
-					});
+				  autocomplete_options = {source: settings.autocomplete_url};
+				  for (attrname in settings.autocomplete) { 
+				    autocomplete_options[attrname] = settings.autocomplete[attrname]; 
+				  }
+          
+					$(data.fake_input).autocomplete(autocomplete_options).bind('autocompleteselect',data,function(event,ui) {
+            gotAutoComplete = true;
+					  $(event.data.real_input).addTag(ui.item.value,{focus:true,unique:(settings.unique)});
+					  return false;
+          });
 					
-					$(data.fake_input).bind('blur',data,function(event) {
-						if( $('.ac_results').is(':visible') ) return false;
-						if ( $(event.data.fake_input).val() != $(event.data.fake_input).attr('data-default')) {
-							if((event.data.minChars <= $(event.data.fake_input).val().length) && (!event.data.maxChars || (event.data.maxChars >= $(event.data.fake_input).val().length)))
-								$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:false,unique:(settings.unique)});						
-						}
-						
-						$(event.data.fake_input).val($(event.data.fake_input).attr('data-default'));
-						$(event.data.fake_input).css('color','#666666');
-						return false;
+					
+          $(data.fake_input).bind('blur',data,function(event) {
+            setTimeout(function() {
+              if(gotAutoComplete == true) {
+                gotAutoComplete = false;
+                return false;
+              }
+              if ( $(event.data.fake_input).val() != $(event.data.fake_input).attr('data-default')) {
+                if((event.data.minChars <= $(event.data.fake_input).val().length) && (!event.data.maxChars || (event.data.maxChars >= $(event.data.fake_input).val().length))) {
+                  $(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:false,unique:(settings.unique)});						
+                }
+              }
+
+              $(event.data.fake_input).val($(event.data.fake_input).attr('data-default'));
+              $(event.data.fake_input).css('color',settings.placeholderColor);              
+            }, 100);
+            return false;
 					});
 			
 				} else {
@@ -206,7 +230,7 @@
 									$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:true,unique:(settings.unique)});
 							} else {
 								$(event.data.fake_input).val($(event.data.fake_input).attr('data-default'));
-								$(event.data.fake_input).css('color','#666666');
+								$(event.data.fake_input).css('color',settings.placeholderColor);
 							}
 							return false;
 						});
