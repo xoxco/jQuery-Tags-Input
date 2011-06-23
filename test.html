@@ -7,6 +7,13 @@
 	<link rel="stylesheet" type="text/css" href="jquery.tagsinput.css" />
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
 	<script type="text/javascript" src="jquery.tagsinput.js"></script>
+	<!-- To test using the original jQuery.autocomplete, uncomment the following -->
+	<!--
+	<script type='text/javascript' src='http://xoxco.com/x/tagsinput/jquery-autocomplete/jquery.autocomplete.min.js'></script>
+	<link rel="stylesheet" type="text/css" href="http://xoxco.com/x/tagsinput/jquery-autocomplete/jquery.autocomplete.css" />
+	-->
+	<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js'></script>
+	<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/themes/start/jquery-ui.css" />
 	
 	
 	<script type="text/javascript">
@@ -31,6 +38,10 @@
 					});
 				}
 			});
+			$('#tags_3').tagsInput({
+				//autocomplete_url:'test/fake_plaintext_endpoint.html' //jquery.autocomplete (not jquery ui)
+				autocomplete_url:'test/fake_json_endpoint.html' // jquery ui autocomplete requires a json endpoint
+			});
 			
 // Uncomment this line to see the callback functions in action
 //			$('input.tags').tagsInput({onAddTag:onAddTag,onRemoveTag:onRemoveTag});		
@@ -52,6 +63,10 @@
 			
 			<label>Technologies: (Programming languages in yellow)</label>
 			<input id="tags_2" type="text" class="tags" value="php,ios,javascript,ruby,android,kindle" />
+			
+			<label>Autocomplete:</label>
+			<input id='tags_3' type='text' class='tags'>
+			
 		</form>
 	</section>
 
