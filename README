@@ -47,7 +47,9 @@ $('#tags').tagsInput({
   autocomplete_url:'http://myserver.com/api/autocomplete'
 });
 
-You can also send in options to the autocomplete plugin, as described here.
+If you're using the bassistance jQuery.autocomplete, which takes extra 
+parameters, you can also send in options to the autocomplete plugin, as 
+described here.
 
 $('#tags').tagsInput({    
   autocomplete_url:'http://myserver.com/api/autocomplete',
