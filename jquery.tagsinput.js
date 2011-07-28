@@ -22,7 +22,7 @@
 	$.fn.addTag = function(value,options) {
 			var options = jQuery.extend({focus:false,callback:true},options);
 			this.each(function() { 
-				id = $(this).attr('id');
+				var id = $(this).attr('id');
 
 				var tagslist = $(this).val().split(delimiter[id]);
 				if (tagslist[0] == '') { 
@@ -60,13 +60,13 @@
 					
 					if (options.callback && tags_callbacks[id] && tags_callbacks[id]['onAddTag']) {
 						var f = tags_callbacks[id]['onAddTag'];
-						f(value);
+						f.call(this, value);
 					}
 					if(tags_callbacks[id] && tags_callbacks[id]['onChange'])
 					{
 						var i = tagslist.length;
 						var f = tags_callbacks[id]['onChange'];
-						f($(this), tagslist[i]);
+						f.call(this, $(this), tagslist[i]);
 					}					
 				}
 				$.fn.tagsInput.updateTagsField(this,tagslist);
@@ -79,7 +79,7 @@
 	$.fn.removeTag = function(value) { 
 			value = unescape(value);
 			this.each(function() { 
-				id = $(this).attr('id');
+				var id = $(this).attr('id');
 	
 				var old = $(this).val().split(delimiter[id]);
 	
@@ -96,7 +96,7 @@
 
 				if (tags_callbacks[id] && tags_callbacks[id]['onRemoveTag']) {
 					var f = tags_callbacks[id]['onRemoveTag'];
-					f(value);
+					f.call(this, value);
 				}
 			});
 					
@@ -137,7 +137,7 @@
 				$(this).hide();				
 			}
 				
-			id = $(this).attr('id')
+			var id = $(this).attr('id')
 			
 			data = jQuery.extend({
 				pid:id,
@@ -273,7 +273,7 @@
 		if(tags_callbacks[id] && tags_callbacks[id]['onChange'])
 		{
 			var f = tags_callbacks[id]['onChange'];
-			f(obj, tags[i]);
+			f.call(obj, obj, tags[i]);
 		}
 	};
 
