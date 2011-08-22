@@ -18,7 +18,12 @@
 
 	var delimiter = new Array();
 	var tags_callbacks = new Array();
-	
+	$.fn.doAutosize = function(options){
+    alert(JSON.stringify(options));
+  }
+  $.fn.resetAutosize = function(options){
+    alert(JSON.stringify(options));
+  }
 	$.fn.addTag = function(value,options) {
 			var options = jQuery.extend({focus:false,callback:true},options);
 			this.each(function() { 
@@ -129,7 +134,8 @@
       'delimiter':',',
       'unique':true,
       removeWithBackspace:true,
-      placeholderColor:'#666666'
+      placeholderColor:'#666666',
+      autosize: true
     },options);
 
 		this.each(function() { 
@@ -232,9 +238,12 @@
 					if (event.which==event.data.delimiter.charCodeAt(0) || event.which==13 ) {
 						if( (event.data.minChars <= $(event.data.fake_input).val().length) && (!event.data.maxChars || (event.data.maxChars >= $(event.data.fake_input).val().length)) )
 							$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:true,unique:(settings.unique)});
-						
+						  $(event.data.fake_input).resetAutosize(settings);
 						return false;
-					}
+					} else if (event.data.autosize) {
+            $(event.data.fake_input).doAutosize(settings);
+            
+          }
 				});
 				//Delete last tag on backspace
 				data.removeWithBackspace && $(data.fake_input).bind('keydown', function(event)
