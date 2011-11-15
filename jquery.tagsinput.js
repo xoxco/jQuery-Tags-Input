@@ -20,9 +20,9 @@
 	var tags_callbacks = new Array();
 	
 	$.fn.addTag = function(value,options) {
-			var options = jQuery.extend({focus:false,callback:true},options);
+			options = jQuery.extend({focus:false,callback:true},options);
 			this.each(function() { 
-				id = $(this).attr('id');
+				var id = $(this).attr('id');
 
 				var tagslist = $(this).val().split(delimiter[id]);
 				if (tagslist[0] == '') { 
@@ -32,11 +32,11 @@
 				value = jQuery.trim(value);
 		
 				if (options.unique) {
-					skipTag = $(tagslist).tagExist(value);
+					var skipTag = $(tagslist).tagExist(value);
 				} else {
-					skipTag = false; 
+					var skipTag = false; 
 				}
-
+				
 				if (value !='' && skipTag != true) { 
                     $('<span>').addClass('tag').append(
                         $('<span>').text(value).append('&nbsp;&nbsp;'),
@@ -58,6 +58,8 @@
 						$('#'+id+'_tag').blur();
 					}
 					
+					$.fn.tagsInput.updateTagsField(this,tagslist);
+					
 					if (options.callback && tags_callbacks[id] && tags_callbacks[id]['onAddTag']) {
 						var f = tags_callbacks[id]['onAddTag'];
 						f(value);
@@ -69,7 +71,6 @@
 						f($(this), tagslist[i]);
 					}					
 				}
-				$.fn.tagsInput.updateTagsField(this,tagslist);
 		
 			});		
 			
@@ -79,11 +80,10 @@
 	$.fn.removeTag = function(value) { 
 			value = unescape(value);
 			this.each(function() { 
-				id = $(this).attr('id');
+				var id = $(this).attr('id');
 	
 				var old = $(this).val().split(delimiter[id]);
-	
-				
+					
 				$('#'+id+'_tagsinput .tag').remove();
 				str = '';
 				for (i=0; i< old.length; i++) { 
@@ -104,11 +104,7 @@
 		};
 	
 	$.fn.tagExist = function(val) {
-		if (jQuery.inArray(val, $(this)) == -1) {
-		  return false; /* Cannot find value in array */
-		} else {
-		  return true; /* Value found */
-		}
+		return (jQuery.inArray(val, $(this)) >= 0); //true when tag exists, false when not
 	};
 	
 	// clear all existing tags and import new ones from a string
@@ -138,16 +134,15 @@
 				$(this).hide();				
 			}
 				
-			id = $(this).attr('id')
+			var id = $(this).attr('id')
 			
-			data = jQuery.extend({
+			var data = jQuery.extend({
 				pid:id,
 				real_input: '#'+id,
 				holder: '#'+id+'_tagsinput',
 				input_wrapper: '#'+id+'_addTag',
 				fake_input: '#'+id+'_tag'
 			},settings);
-	
 	
 			delimiter[id] = data.delimiter;
 			
@@ -199,8 +194,7 @@
 				    $(data.fake_input).autocomplete(settings.autocomplete_url, settings.autocomplete);
 				    $(data.fake_input).bind('result',data,function(event,data,formatted) {
               if (data) {
-                d = data + "";
-                $(event.data.real_input).addTag(d,{focus:true,unique:(settings.unique)});
+                $('#'+id).addTag(data + "",{focus:true,unique:(settings.unique)});
               }
             });
 				  } else if (jQuery.ui.autocomplete !== undefined) {
@@ -229,11 +223,12 @@
 				
 				}
 				// if user types a comma, create a new tag
-				$(data.fake_input).bind('keypress',data,function(event) { 
+				$(data.fake_input).bind('keypress',data,function(event) {
 					if (event.which==event.data.delimiter.charCodeAt(0) || event.which==13 ) {
+					    event.preventDefault();
 						if( (event.data.minChars <= $(event.data.fake_input).val().length) && (!event.data.maxChars || (event.data.maxChars >= $(event.data.fake_input).val().length)) )
 							$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:true,unique:(settings.unique)});
-						
+					    
 						return false;
 					}
 				});
@@ -248,9 +243,10 @@
 						 last_tag = last_tag.replace(/[\s]+x$/, '');
 						 $('#' + id).removeTag(escape(last_tag));
 						 $(this).trigger('focus');
-					};
+					}
 				});
 				$(data.fake_input).blur();
+				
 			} // if settings.interactive
 			return false;
 		});
@@ -260,13 +256,13 @@
 	};
 	
 	$.fn.tagsInput.updateTagsField = function(obj,tagslist) { 
-		id = $(obj).attr('id');
+		var id = $(obj).attr('id');
 		$(obj).val(tagslist.join(delimiter[id]));
 	};
 	
 	$.fn.tagsInput.importTags = function(obj,val) {			
 		$(obj).val('');
-		id = $(obj).attr('id');
+		var id = $(obj).attr('id');
 		var tags = val.split(delimiter[id]);
 		for (i=0; i<tags.length; i++) { 
 			$(obj).addTag(tags[i],{focus:false,callback:false});
