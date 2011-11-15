@@ -113,6 +113,7 @@
 	
 	// clear all existing tags and import new ones from a string
 	$.fn.importTags = function(str) {
+                id = $(this).attr('id');
 		$('#'+id+'_tagsinput .tag').remove();
 		$.fn.tagsInput.importTags(this,str);
 	}
