@@ -66,13 +66,13 @@
 					
 					if (options.callback && tags_callbacks[id] && tags_callbacks[id]['onAddTag']) {
 						var f = tags_callbacks[id]['onAddTag'];
-						f(value);
+						f.call(this, value);
 					}
 					if(tags_callbacks[id] && tags_callbacks[id]['onChange'])
 					{
 						var i = tagslist.length;
 						var f = tags_callbacks[id]['onChange'];
-						f($(this), tagslist[i]);
+						f.call(this, $(this), tagslist[i]);
 					}					
 				}
 		
@@ -100,7 +100,7 @@
 
 				if (tags_callbacks[id] && tags_callbacks[id]['onRemoveTag']) {
 					var f = tags_callbacks[id]['onRemoveTag'];
-					f(value);
+					f.call(this, value);
 				}
 			});
 					
@@ -282,7 +282,7 @@
 		if(tags_callbacks[id] && tags_callbacks[id]['onChange'])
 		{
 			var f = tags_callbacks[id]['onChange'];
-			f(obj, tags[i]);
+			f.call(obj, obj, tags[i]);
 		}
 	};
 
