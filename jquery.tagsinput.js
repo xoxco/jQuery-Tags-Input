@@ -33,6 +33,10 @@
 		
 				if (options.unique) {
 					var skipTag = $(tagslist).tagExist(value);
+					if(skipTag == true) {
+					    //Marks fake input as not_valid to let styling it
+    				    $('#'+id+'_tag').addClass('not_valid');
+    				}
 				} else {
 					var skipTag = false; 
 				}
@@ -247,6 +251,14 @@
 				});
 				$(data.fake_input).blur();
 				
+				//Removes the not_valid class when user changes the value of the fake input
+				if(data.unique) {
+				    $(data.fake_input).keydown(function(event){
+				        if(event.keyCode == 8 || String.fromCharCode(event.which).match(/\w+|[áéíóúÁÉÍÓÚñÑ,/]+/)) {
+				            $(this).removeClass('not_valid');
+				        }
+				    });
+				}
 			} // if settings.interactive
 			return false;
 		});
