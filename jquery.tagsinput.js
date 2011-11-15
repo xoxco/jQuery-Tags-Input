@@ -126,7 +126,7 @@
 					{
 						var i = tagslist.length;
 						var f = tags_callbacks[id]['onChange'];
-						f.call(this, $(this), tagslist[i]);
+						f.call(this, $(this), tagslist[i-1]);
 					}					
 				}
 		
