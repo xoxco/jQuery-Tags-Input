@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="utf-8" />
-	<title>jQuery Tags Input Test Page</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />	
-	<link rel="stylesheet" type="text/css" href="jquery.tagsinput.css" />
+
+	<link rel="stylesheet" type="text/css" href="http://xoxco.com/projects/code/tagsinput/jquery.tagsinput.css" />
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
-	<script type="text/javascript" src="jquery.tagsinput.js"></script>
+	<script type="text/javascript" src="http://xoxco.com/projects/code/tagsinput/jquery.tagsinput.js"></script>
 	<!-- To test using the original jQuery.autocomplete, uncomment the following -->
 	<!--
 	<script type='text/javascript' src='http://xoxco.com/x/tagsinput/jquery-autocomplete/jquery.autocomplete.min.js'></script>
@@ -31,8 +26,9 @@
 		
 		$(function() {
 
-			$('#tags_1').tagsInput();
+			$('#tags_1').tagsInput({width:'auto'});
 			$('#tags_2').tagsInput({
+				width: 'auto',
 				onChange: function(elem, elem_tags)
 				{
 					var languages = ['php','ruby','javascript'];
@@ -44,6 +40,8 @@
 				}
 			});
 			$('#tags_3').tagsInput({
+				width: 'auto',
+
 				//autocomplete_url:'test/fake_plaintext_endpoint.html' //jquery.autocomplete (not jquery ui)
 				autocomplete_url:'test/fake_json_endpoint.html' // jquery ui autocomplete requires a json endpoint
 			});
@@ -57,23 +55,14 @@
 		});
 	
 	</script>
-	
-</head>
-<body>
-	<header>
-		jQuery Tags Input!
-	</header>	
-	<section>	
 		<form>
-			<input id="tags_1" type="text" class="tags" value="foo,bar,baz,roffle" />
+			<p><label>Defaults:</label>
+			<input id="tags_1" type="text" class="tags" value="foo,bar,baz,roffle" /></p>
 			
-			<label>Technologies: (Programming languages in yellow)</label>
-			<input id="tags_2" type="text" class="tags" value="php,ios,javascript,ruby,android,kindle" />
+			<p><label>Technologies: (Programming languages in yellow)</label>
+			<input id="tags_2" type="text" class="tags" value="php,ios,javascript,ruby,android,kindle" /></p>
 			
-			<label>Autocomplete:</label>
-			<input id='tags_3' type='text' class='tags'>
+			<p><label>Autocomplete:</label>
+			<input id='tags_3' type='text' class='tags'></p>
 			
 		</form>
-	</section>
-
-</body>
