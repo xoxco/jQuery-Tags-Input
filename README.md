@@ -80,7 +80,7 @@ By default, if the cursor is immediately after a tag, hitting backspace will
 delete that tag. If you want to override this, set the 'removeWithBackspace' 
 option to false.
 
-Options
+## Options
 
 	$(selector).tagsInput({
 	   'autocomplete_url': url_to_autocomplete_api,
