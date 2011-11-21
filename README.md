@@ -7,10 +7,11 @@ object with its own delete link. The plugin handles
 all the data - your form just sees a comma-delimited 
 list of tags!
 
-
 [Get it from Github](https://github.com/xoxco/jQuery-Tags-Input)
 
-[View Demo](http://xoxco.com/projects/code/tagsinput)
+[View Demo](http://xoxco.com/projects/code/tagsinput/)
+
+Created by [XOXCO](http://xoxco.com)
 
 
 ## Instructions
