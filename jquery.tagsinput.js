@@ -1,6 +1,6 @@
 /*
 
-	jQuery Tags Input Plugin 1.3.2
+	jQuery Tags Input Plugin 1.3.3
 	
 	Copyright (c) 2011 XOXCO, Inc
 	
@@ -187,7 +187,7 @@
       placeholderColor:'#666666',
       autosize: true,
       comfortZone: 20,
-      inputPadding: 6*2,
+      inputPadding: 6*2
     },options);
 
 		this.each(function() { 
