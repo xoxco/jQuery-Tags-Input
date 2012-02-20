@@ -1,12 +1,8 @@
 
 	<link rel="stylesheet" type="text/css" href="http://xoxco.com/projects/code/tagsinput/jquery.tagsinput.css" />
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<script type="text/javascript" src="jquery.tagsinput.js"></script>
-	<!-- To test using the original jQuery.autocomplete, uncomment the following -->
-	<!--
-	<script type='text/javascript' src='http://xoxco.com/x/tagsinput/jquery-autocomplete/jquery.autocomplete.min.js'></script>
-	<link rel="stylesheet" type="text/css" href="http://xoxco.com/x/tagsinput/jquery-autocomplete/jquery.autocomplete.css" />
-	-->
+
 	<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js'></script>
 	<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/themes/start/jquery-ui.css" />
 	
@@ -36,12 +32,16 @@
 		
 		$(function() {
 
-		//	$('.tags').tagsInput({validateTag: validateTag,onError: onError,onAddTag:onAddTag,onRemoveTag:onRemoveTag,onChange: onChangeTag});		
+		//	$('.tags').tagsInput({validateTag: validateTag,,onAddTag:onAddTag,onRemoveTag:onRemoveTag,onChange: onChangeTag});		
 			
 			
 
 
-			$('#tags_1').tagsInput({width:'auto'});
+			$('.tags').tagsInput({
+				onError: onError,
+				autocomplete: {source: ['a','alpha']}			
+			});;
+/*
 			$('#tags_2').tagsInput({
 				width: 'auto',
 				onChange: function(elem, elem_tags)
@@ -56,11 +56,11 @@
 			});
 			$('#tags_3').tagsInput({
 				width: 'auto',
-
-				//autocomplete_url:'test/fake_plaintext_endpoint.html' //jquery.autocomplete (not jquery ui)
-				autocomplete_url:'test/fake_json_endpoint.html' // jquery ui autocomplete requires a json endpoint
+				autocomplete: {source: 'test/fake_json_endpoint.html'}
+//				autocomplete: {source: [{label:'Alpha',value:'1'},{label:'Beta',value:'x'}] }
 			});
 
+*/
 			
 
 // Uncomment this line to see the callback functions in action
