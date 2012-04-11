@@ -196,8 +196,10 @@
 			if (settings.hide) { 
 				$(this).hide();				
 			}
-				
-			var id = $(this).attr('id')
+			var id = $(this).attr('id');
+			if (!id || delimiter[$(this).attr('id')]) {
+				id = $(this).attr('id', 'tags' + new Date().getTime()).attr('id');
+			}
 			
 			var data = jQuery.extend({
 				pid:id,
@@ -324,7 +326,6 @@
 				    });
 				}
 			} // if settings.interactive
-			return false;
 		});
 			
 		return this;
