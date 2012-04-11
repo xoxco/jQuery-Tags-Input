@@ -96,7 +96,7 @@
 		
 				var skipTag  = false;
 				if (options.unique) {
-					skipTag = $(tagslist).tagExist(value);
+					skipTag = $(this).tagExist(value);
 					if(skipTag == true) {
 					    //Marks fake input as not_valid to let styling it
     				    $(settings.fake_input).addClass('not_valid');
@@ -185,11 +185,10 @@
 			return false;
 		};
 	
-	$.fn.tagExist = function(val) {
-
-		var settings = $(this).data('settings');
-		var tagslist = $(this).val().split(settings.delimiter);		
-		return (jQuery.inArray(val, tagslist) >= 0); //true when tag exists, false when not
+	$.fn.tagExist = function(val) {	
+			var settings = $(this).data('settings');
+			var tagslist = $(this).val().split(settings.delimiter);	
+			return (jQuery.inArray(val, tagslist) >= 0); //true when tag exists, false when not
 	};
 	
 	// clear all existing tags and import new ones from a string
