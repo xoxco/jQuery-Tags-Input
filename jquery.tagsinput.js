@@ -94,9 +94,9 @@
 
 				value = jQuery.trim(value);
 		
-				var skipTag  = false;
+				skipTag  = false;
 				if (options.unique) {
-					skipTag = $(this).tagExist(value);
+					var skipTag = $(this).tagExist(value);
 					if(skipTag == true) {
 					    //Marks fake input as not_valid to let styling it
     				    $(settings.fake_input).addClass('not_valid');
@@ -375,7 +375,6 @@
 				    });
 				}
 			} // if settings.interactive
-			//return false;
 		});
 			
 		return this;
