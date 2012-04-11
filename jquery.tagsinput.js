@@ -86,7 +86,7 @@
 				value = jQuery.trim(value);
 		
 				if (options.unique) {
-					var skipTag = $(tagslist).tagExist(value);
+					var skipTag = $(this).tagExist(value);
 					if(skipTag == true) {
 					    //Marks fake input as not_valid to let styling it
     				    $('#'+id+'_tag').addClass('not_valid');
@@ -162,7 +162,9 @@
 		};
 	
 	$.fn.tagExist = function(val) {
-		return (jQuery.inArray(val, $(this)) >= 0); //true when tag exists, false when not
+		var id = $(this).attr('id');
+		var tagslist = $(this).val().split(delimiter[id]);
+		return (jQuery.inArray(val, tagslist) >= 0); //true when tag exists, false when not
 	};
 	
 	// clear all existing tags and import new ones from a string
