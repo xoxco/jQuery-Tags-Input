@@ -94,9 +94,9 @@
 
 				value = jQuery.trim(value);
 		
-				skipTag  = false;
+				var skipTag  = false;
 				if (options.unique) {
-					var skipTag = $(this).tagExist(value);
+					skipTag = $(this).tagExist(value);
 					if(skipTag == true) {
 					    //Marks fake input as not_valid to let styling it
     				    $(settings.fake_input).addClass('not_valid');
