@@ -95,6 +95,7 @@ option to false.
 	   'onAddTag':callback_function,
 	   'onRemoveTag':callback_function,
 	   'onChange' : callback_function,
+	   'delimiter': [',',';'],
 	   'removeWithBackspace' : true,
 	   'minChars' : 0,
 	   'maxChars' : 0 //if not provided there is no limit,
