@@ -182,9 +182,9 @@
       width:'300px',
       height:'100px',
       autocomplete: {selectFirst: false },
-      'hide':true,
-      'delimiter':',',
-      'unique':true,
+      hide:true,
+      delimiter:[',',';'],
+      unique:true,
       removeWithBackspace:true,
       placeholderColor:'#666666',
       autosize: true,
@@ -209,7 +209,7 @@
 				fake_input: '#'+id+'_tag'
 			},settings);
 	
-			delimiter[id] = data.delimiter;
+			delimiter[id] = data.delimiter;// todo modify data.delimiter from string to array
 			
 			if (settings.onAddTag || settings.onRemoveTag || settings.onChange) {
 				tags_callbacks[id] = new Array();
@@ -289,9 +289,9 @@
 						});
 				
 				}
-				// if user types a comma, create a new tag
+				// if user types a default delimiter like comma,semicolon and then create a new tag
 				$(data.fake_input).bind('keypress',data,function(event) {
-					if (event.which==event.data.delimiter.charCodeAt(0) || event.which==13 ) {
+					if (_checkDelimiter(event)) {
 					    event.preventDefault();
 						if( (event.data.minChars <= $(event.data.fake_input).val().length) && (!event.data.maxChars || (event.data.maxChars >= $(event.data.fake_input).val().length)) )
 							$(event.data.real_input).addTag($(event.data.fake_input).val(),{focus:true,unique:(settings.unique)});
@@ -351,4 +351,23 @@
 		}
 	};
 
+    /**
+     * check delimiter Array
+     * @param event
+     * @returns {boolean}
+     * @private
+     */
+    var _checkDelimiter = function(event){
+        if(event.which == 13){// Enter
+            return true
+        }
+
+        for(delimiter in event.data.delimiter){
+            if(event.which == delimiter.charCodeAt(0)){// match data.delimiter Array
+                return true
+            }
+        }
+
+        return false;// no match
+    }
 })(jQuery);
