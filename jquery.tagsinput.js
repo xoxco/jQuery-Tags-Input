@@ -230,7 +230,7 @@
 
 			$(data.holder).css('width',settings.width);
 			$(data.holder).css('min-height',settings.height);
-			$(data.holder).css('height','100%');
+			$(data.holder).css('height',settings.height);
 	
 			if ($(data.real_input).val()!='') { 
 				$.fn.tagsInput.importTags($(data.real_input),$(data.real_input).val());
@@ -358,16 +358,18 @@
      * @private
      */
     var _checkDelimiter = function(event){
+        var flag = false;// defalut no match
+
         if(event.which == 13){// Enter
-            return true
+            flag = true;
         }
 
-        for(delimiter in event.data.delimiter){
-            if(event.which == delimiter.charCodeAt(0)){// match data.delimiter Array
-                return true
+        $.each(event.data.delimiter ,function(index, value){
+            if(event.which == value.charCodeAt(0)){// match data.delimiter Array
+                flag = true;
             }
-        }
+        });
 
-        return false;// no match
+        return flag;
     }
 })(jQuery);
