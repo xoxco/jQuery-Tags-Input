@@ -209,7 +209,7 @@
 				fake_input: '#'+id+'_tag'
 			},settings);
 	
-			delimiter[id] = data.delimiter;// todo modify data.delimiter from string to array
+			delimiter[id] = data.delimiter;
 			
 			if (settings.onAddTag || settings.onRemoveTag || settings.onChange) {
 				tags_callbacks[id] = new Array();
