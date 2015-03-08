@@ -5,8 +5,9 @@
    Licensed under the MIT license:
    http://www.opensource.org/licenses/mit-license.php
 
-   Original Author: ben@xoxco.com
-   Current Author: lucknerjb@gmail.com
+   Authors:
+      - ben@xoxco.com
+      - lucknerjb@gmail.com
 
 */
 
