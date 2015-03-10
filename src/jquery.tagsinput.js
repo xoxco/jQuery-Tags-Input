@@ -12,8 +12,8 @@
 */
 
 (function($) {
-   var delimiter = new Array();
-   var tags_callbacks = new Array();
+   var delimiter = [];
+   var tags_callbacks = [];
    $.fn.doAutosize = function(o){
       var minWidth = $(this).data('minwidth');
       var maxWidth = $(this).data('maxwidth');
@@ -78,7 +78,7 @@
          var tagslist = $(this).val().split(delimiter[id]);
 
          if (tagslist[0] == '') {
-            tagslist = new Array();
+            tagslist = [];
          }
 
          value = jQuery.trim(value);
@@ -211,7 +211,7 @@
          delimiter[id] = data.delimiter;
 
          if (settings.onAddTag || settings.onRemoveTag || settings.onChange) {
-            tags_callbacks[id] = new Array();
+            tags_callbacks[id] = [];
             tags_callbacks[id]['onAddTag'] = settings.onAddTag;
             tags_callbacks[id]['onRemoveTag'] = settings.onRemoveTag;
             tags_callbacks[id]['onChange'] = settings.onChange;

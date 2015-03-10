@@ -1,0 +1,37 @@
+
+   <link rel="stylesheet" type="text/css" href="./jquery.tagsinput.css" />
+   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+   <script type="text/javascript" src="./core.js"></script>
+
+   <script type="text/javascript">
+
+      function onAddTag(tag) {
+         alert("Added a tag: " + tag);
+      }
+      function onRemoveTag(tag) {
+         alert("Removed a tag: " + tag);
+      }
+
+      function onChangeTag(input,tag) {
+         alert("Changed a tag: " + tag);
+      }
+
+      $(function() {
+         var tags = $('.tags_1').tagsInput();
+         $('.tags_1').tagsInput('importTags', 'asdasd, asdasdasd; asdsds');
+         // var core = $.tagsInput;
+         // console.log(core);
+      });
+
+   </script>
+      <form style="height: 200px;">
+         <p><label>Defaults:</label>
+         <input type="text" class="tags tags_1" value="foo,bar,baz,roffle" /></p>
+
+         <p><label>Technologies: (Programming languages in yellow)</label>
+         <input id="tags_2" type="text" class="tags" value="php,ios,javascript,ruby,android,kindle" /></p>
+
+         <p><label>Autocomplete:</label>
+         <input id='tags_3' type='text' class='tags'></p>
+
+      </form>
