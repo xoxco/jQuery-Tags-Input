@@ -13,199 +13,207 @@
 }(this, function($) {
    'use strict';
 
-   var $element;
-   var elementData = {};
-   var delimiter = [];
-   var delimiterRegex = '/[\s,]+/';
-   var tagsCallbacks = [];
-
-   // Default options
-   var options = {};
-   var defaults = {
-      // Config
-      interactive: true,
-      defaultText: 'add a tag',
-      minChars: 0,
-      delimiter: [',', ';'],
-      joinDelimiter: ',',
-      unique: true,
-      removeWithBackspace: true,
-
-      // UI
-      width: '300px',
-      height: '100px',
-      hide: true,
-      placeholderColor: '#666666',
-      autosize: true,
-      comfortZone: 20,
-      inputPadding: 6 * 2,
-
-      // Autocomplete
-      autocomplete: {
-         selectFirst: true
-      }
-
-      // Hooks
+   var Plugin = {};
+   Plugin.core = {
+      document: $(document),
    };
 
-   // Constructor, initialize everything you need here
-   var Plugin = function(element, options) {
-      this.element = element;
-      this.options = options;
+   Plugin.Setup = function() {
+      var self = this;
+
+      this.opts = null;
+      this.$ = null;
+      this.$fakeInput = null;
+      this.delimiter = [];
+      this.elementData = {};
+      this.$realInput = null;
+      this.defaultOpts = {
+         // Config
+         interactive: true,
+         defaultText: 'add a tag',
+         minChars: 0,
+         delimiter: [',', ';'],
+         delimiterRegex: '/[\s,]+/',
+         joinDelimiter: ',',
+         unique: true,
+         removeWithBackspace: true,
+
+         // UI
+         width: '300px',
+         height: '100px',
+         hide: true,
+         placeholderColor: '#666666',
+         autosize: true,
+         comfortZone: 20,
+         inputPadding: 6 * 2,
+
+         // Autocomplete
+         autocomplete: {
+            selectFirst: true
+         }
+
+         // Hooks
+      };
+
+      this.run = function() {
+         // If we've already instanciated the element, return
+         if (this.$.data('tagsinput-init-complete')) {
+            return;
+         }
+         this.$.data('tagsinput-init-complete', true);
+
+         // Configure the options
+         this.extend();
+         this.opts = $.extend(true, {}, this.defaultOpts, this.opts);
+
+         this.init();
+         this.listen();
+
+         /*
+         // finalize init
+            this._listen()
+                ._configure()
+                ._xy()
+                .init();
+         */
+         this.isInit = true;
+         //
+      };
+
+      // Abstract methods
+      this.init = function() {};
+      this.extend = function() {};
+      this.listen = function() {};
+      this.exportTags = function() {};
    };
 
-   // Private functions
-   var _hide = function() {
-      $element.hide();
-   }
+   Plugin.Main = function() {
+      Plugin.Setup.call(this);
+      var self = this;
 
-   var _generateId = function() {
-      var id = $element.attr('id');
-      if (!id || delimiter[id]) {
-         id = 'tags' + new Date().getTime();
-         $element.attr('id', id);
+      // Private members
+      this._hide = function() {
+         this.$.hide();
+      };
+
+      this._generateId = function() {
+         var id = this.$.attr('id');
+         if (!id || this.delimiter[id]) {
+            id = 'tags' + new Date().getTime();
+            this.$.attr('id', id);
+         }
+
+         return id;
       }
 
-      return id;
-   }
-
-   var _updateDelimiterRegex = function() {
-      var matchString = '';
-      $.each(options.delimiter, function(index, val) {
-         matchString = matchString + val;
-      });
-      var regexString = '[\\s' + matchString + ']+';
-      delimiterRegex = new RegExp(regexString, 'i');
-   }
-
-   var _displayMarkup = function() {
-      var id = $element.attr('id');
-      var markup = '<div id="' + id + '_tagsinput" class="tagsinput"><div id="' + id +'_addTag">';
-
-      if (options.interactive) {
-         markup = markup + '<input id="' + id + '_tag" value="" data-default="' + options.defaultText + '" />';
+      this._updateDelimiterRegex = function() {
+         var matchString = '';
+         $.each(this.opts.delimiter, function(index, val) {
+            matchString = matchString + val;
+         });
+         var regexString = '[\\s' + matchString + ']+';
+         this.opts.delimiterRegex = new RegExp(regexString, 'i');
       }
 
-      markup = markup + '</div><div class="tags_clear"></div></div>';
-      $(markup).insertAfter($element);
+      this._displayMarkup = function() {
+         var id = this.$.attr('id');
+         var markup = '<div id="' + id + '_tagsinput" class="tagsinput"><div id="' + id +'_addTag">';
 
-      // Apply CSS options to the markup
-      $(elementData.holder).css('width', options.width);
-      $(elementData.holder).css('min-height', options.height);
-      $(elementData.holder).css('height', '100%');
-   }
+         if (this.opts.interactive) {
+            markup = markup + '<input id="' + id + '_tag" value="" data-default="' + this.opts.defaultText + '" />';
+         }
 
-   var _importTags = function(str) {
-      var id = $element.attr('id');
-      $('#' + id + '_tagsinput .tag').remove();
-      methods['importTags']($element, str);
-   }
+         markup = markup + '</div><div class="tags_clear"></div></div>';
+         $(markup).insertAfter(this.$);
 
-   var _updateTagsField = function(tags) {
-      var id = $element.attr('id');
-      $element.val(tags.join(options.joinDelimiter));
-   }
-
-   var _checkDelimiter = function(e) {
-      if (e.which === 13) {
-         return true;
+         // Apply CSS options to the markup
+         $(this.elementData.holder).css('width', this.opts.width);
+         $(this.elementData.holder).css('min-height', this.opts.height);
+         $(this.elementData.holder).css('height', '100%');
       }
 
-      $.each(e.data.delimiter, function(index, value) {
-         console.log(value);
-      });
-   }
+      this._importTags = function(e, str) {
+         console.log(123);
+         var id = this.$.attr('id');
+         $('#' + id + '_tagsinput .tag').remove();
+         methods['importTags'](this.$, str);
+      }
 
-   var methods = {
-      init: function(opts) {
-         // Do a deep copy of the options
-         options = $.extend(true, {}, defaults, opts);
+      this._updateTagsField = function(tags) {
+         var id = this.$.attr('id');
+         this.$.val(tags.join(this.opts.joinDelimiter));
+      }
 
-         this.each(function() {
-            $element = $(this);
+      this._checkDelimiter = function(e) {
+         var delimiterFound = false;
 
-            // Hide the element if the option is set
-            if (options.hide) {
-               _hide();
-            }
+         // Handle the enter key
+         if (e.which === 13) {
+            delimiterFound = true;
+         }
 
-            // Generate an ID for the element if it does not have one
-            var id = _generateId();
-
-            // Create the delimiter data object
-            elementData = jQuery.extend({
-               pid            : id,
-               realInput      : '#' + id,
-               holder         : '#' + id + '_tagsinput',
-               inputWrapper   : '#' + id + '_addTag',
-               fakeInput      : '#' + id + '_tag'
-            }, options);
-            delimiter[id] = elementData.delimiter;
-
-            // Modify the delimiter regex if need be
-            _updateDelimiterRegex();
-
-            // Setup and show the markup
-            _displayMarkup();
-
-            if (options.interactive) {
-               $(elementData.fakeInput).bind('keypress', elementData, function(e) {
-                  if (_checkDelimiter(e)) {
-                     console.log(1);
-                  } else {
-                     console.log(2);
-                  }
-               });
+         // Loop over the delimieters and see if we get a match
+         $.each(e.data.delimiter, function(index, value) {
+            if(e.which == value.charCodeAt(0)){
+               delimiterFound = true
             }
          });
-      },
 
-      importTags: function(obj, val) {
-         var $obj = $(obj);
-         var id = $obj.attr('id');
-         var tags = val.split(delimiterRegex);
+         return delimiterFound;
+      }
 
-         for (var i = 0; i < tags.length; i++) {
-            methods['addTag'](obj, tags[i], {focus: false, callback: false});
+      this._validateTagLength = function(data) {
+         var valid = true;
+         var $elem = $(data.fakeInput);
+         var tagLength = $elem.val().length;
+
+         // Tag is too short
+         if (data.minChars > tagLength) {
+            valid = false;
          }
 
-         if(tagsCallbacks[id] && tagsCallbacks[id]['onChange']) {
-            var func = tagsCallbacks[id]['onChange'];
-            func.call(obj, obj, tags[i]);
+         // Tag is too long
+         if (data.maxChars && (data.maxChars < tagLength)) {
+            valid = false;
          }
-      },
 
-      tagExists: function(elem, value) {
-         var $elem = $(elem);
-         var id = $elem.attr('id');
-         var tags = $elem.val().split(delimiterRegex);
-         return (jQuery.inArray(value, tags) >= 0);
-      },
+         return valid;
+      }
 
-      addTag: function(elem, value, opts) {
-         var $elem = $(elem);
-         var defaultOpts = {
+      this._tagExists = function(e, tag) {
+         var currentTarget = $(e.currentTarget);
+         var id = currentTarget.attr('id');
+         var tags = currentTarget.val().split(this.opts.delimiterRegex);
+
+         return (jQuery.inArray(tag, tags) >= 0);
+      };
+
+      this._addTag = function(e, opts) {
+         var self = this;
+         var tagValue = opts.tag;
+         delete opts.tag;
+
+         opts = jQuery.extend({
             focus: false,
             callback: false
-         };
-         opts = jQuery.extend(defaultOpts, opts);
+         }, opts);
 
-         $elem.each(function() {
+         this.$.each(function() {
             var $self = $(this);
             var id = $self.attr('id');
-            var tags = $self.val().split(delimiterRegex);
+            var tags = $self.val().split(self.opts.delimiterRegex);
 
             if (tags[0] === '') {
                tags = [];
             }
 
             // Trim the new tag before continuing
-            value = jQuery.trim(value);
+            tagValue = jQuery.trim(tagValue);
 
             // Check for uniqueness if this option is enabled
             var skipTag = false;
-            if (options.unique) {
-               skipTag = methods['tagExists'](elem, value);
+            if (self.opts.unique) {
+               $self.trigger('tagExists', {tag: tagValue});
                if (skipTag) {
                   // @TODO: Move these into an elements holder
                   $('#' + id + '_tag').addClass('not_valid');
@@ -213,7 +221,7 @@
             }
 
             // Add the tag
-            if (value !== '' && skipTag === false) {
+            if (tagValue !== '' && skipTag === false) {
                // Create the remove tag element
                var anchorTagAttrs = {
                   href: '#',
@@ -221,12 +229,12 @@
                   text: 'x'
                };
                var anchorTag = $('<a>', anchorTagAttrs).click(function(e) {
-                  return methods['removeTag', id, escape(value)];
+                  return methods['removeTag', id, escape(tagValue)];
                });
 
                // Create the inner span element
                var innerSpan = $('<span>')
-                  .text(value)
+                  .text(tagValue)
                   .append('&nbsp;&nbsp;');
 
                // Create the outer span element
@@ -236,23 +244,23 @@
                   .insertBefore('#' + id + '_addTag');
 
                // Add the tag to the tag list
-               tags.push(value);
+               tags.push(tagValue);
 
                // Clear the input box and set the focus based on the options
                $('#' + id + '_tag').val('');
-               if (options.focus) {
+               if (opts.focus) {
                   $('#' + id + '_tag').focus();
                } else {
                   $('#' + id + '_tag').blur();
                }
 
                // Update the hidden tags field
-               _updateTagsField(tags);
+               self._updateTagsField(tags);
 
                // @TODO: Callbacks
                // if (options.callback && tags_callbacks[id] && tags_callbacks[id]['onAddTag']) {
                //    var f = tags_callbacks[id]['onAddTag'];
-               //    f.call(this, value);
+               //    f.call(this, tagValue);
                // }
                // if(tags_callbacks[id] && tags_callbacks[id]['onChange'])
                // {
@@ -262,47 +270,229 @@
                // }
             }
          });
+      };
+
+      this._resetAutosize = function(e) {
+         var $elem = $(e.currentTarget);
+
+         var minWidth =  $elem.data('minwidth') || this.opts.minInputWidth || $elem.width();
+         var maxWidth = $elem.data('maxwidth') || this.opts.maxInputWidth || ($elem.closest('.tagsinput').width() - this.opts.inputPadding);
+         var val = '';
+         var input = $elem;
+         var testSubject = $('<tester/>').css({
+            position: 'absolute',
+            top: -9999,
+            left: -9999,
+            width: 'auto',
+            fontSize: input.css('fontSize'),
+            fontFamily: input.css('fontFamily'),
+            fontWeight: input.css('fontWeight'),
+            letterSpacing: input.css('letterSpacing'),
+            whiteSpace: 'nowrap'
+         });
+         var testerId = $elem.attr('id')+'_autosize_tester';
+
+         if(! $('#'+testerId).length > 0){
+            testSubject.attr('id', testerId);
+            testSubject.appendTo('body');
+         }
+
+         input.data('minwidth', minWidth);
+         input.data('maxwidth', maxWidth);
+         input.data('tester_id', testerId);
+         input.css('width', minWidth);
+      };
+
+      this._removeTag = function(e, tag) {
+         var self = this;
+         var str;
+         var currentTarget = $(e.currentTarget);
+         tag = unescape(tag);
+
+         currentTarget.each(function() {
+            str = '';
+            var id = $(this).attr('id');
+            var old = $(this).val().split(self.opts.delimiterRegex);
+            console.log(old);
+
+            $('#' + id + '_tagsinput .tag').remove();
+            for (var i = 0; i < old.length; i++) {
+               if (old[i] !== tag) {
+                  str = str + self.opts.delimiter[id] + old[i];
+               }
+            }
+
+            currentTarget.trigger('importTags', str);
+
+            // @TODO
+            // if (tags_callbacks[id] && tags_callbacks[id]['onRemoveTag']) {
+            //    var f = tags_callbacks[id]['onRemoveTag'];
+            //    f.call(this, tag);
+            // }
+         });
 
          return false;
-      }
+      };
+
+      this.listen = function() {
+         // Bind resetAutosize event
+         $(this.elementData.fakeInput).bind('resetAutosize', $.proxy(self._resetAutosize, this));
+
+         // Bind removeTag event
+         this.$.bind('removeTag', $.proxy(self._removeTag, this));
+
+         // Bind addTag event
+         this.$.bind('addTag', $.proxy(self._addTag, this));
+
+         // Bind imporTags event
+         this.$.bind('imporTags', $.proxy(self._importTags, this));
+
+         // Bind tagExists event
+         this.$.bind('tagExists', $.proxy(self._tagExists, this));
+      };
+
+      this.init = function() {
+         // Hide the element if the option is set
+         if (this.opts.hide) {
+            this._hide();
+         }
+
+         // Generate an ID for the element if it does not have one
+         var id = this._generateId();
+
+         // Create the delimiter data object
+         this.elementData = jQuery.extend({
+            pid            : id,
+            realInput      : '#' + id,
+            holder         : '#' + id + '_tagsinput',
+            inputWrapper   : '#' + id + '_addTag',
+            fakeInput      : '#' + id + '_tag'
+         }, this.opts);
+         this.delimiter[id] = this.elementData.delimiter;
+
+         // Modify the delimiter regex if need be
+         this._updateDelimiterRegex();
+
+         // Setup and show the markup
+         this._displayMarkup();
+
+         if (this.opts.interactive) {
+            $(this.elementData.fakeInput).bind('keypress', this.elementData, function(e) {
+               // Check if the character typed is a delimiter
+               if (self._checkDelimiter(e)) {
+                  e.preventDefault();
+
+                  // Validate the length of the tag and add if valid
+                  if (self._validateTagLength(e.data)) {
+                     var tag = $(e.data.fakeInput).val();
+                     self.$.trigger('addTag', {tag: tag, focus: true, unique: (self.opts.unique)});
+                     $(e.data.fakeInput).trigger('resetAutosize');
+                  }
+                  return false;
+               } else if (e.data.autosize) {
+                  $(e.data.fakeInput).trigger('resetAutosize');
+               }
+            });
+
+            // Delete last tag on backspace
+            if (this.opts.removeWithBackspace) {
+               $(this.elementData.fakeInput).bind('keydown', function(e) {
+                  if (e.keyCode == 8 && $(this).val() == '') {
+                     e.preventDefault();
+                     var last_tag = $(this).closest('.tagsinput').find('.tag:last').text();
+                     var id = $(this).attr('id').replace(/_tag$/, '');
+                     last_tag = last_tag.replace(/[\s]+x$/, '');
+                     $('#' + id).trigger('removeTag', escape(last_tag));
+                     $(this).trigger('focus');
+                  }
+               });
+            }
+         }
+      };
    };
 
-   // Create the jQuery plugin
-   $.fn.tagsInput = function(methodOrOptions) {
-      // Call method if it exists
-      if (methods[methodOrOptions]) {
-         var args = Array.prototype.slice.call(arguments, 1);
-         var id = $(this).attr('id');
-         args.splice(0, 0, '#' + id);
-         return methods[methodOrOptions].apply(this, args);
-      }
-      else if (typeof methodOrOptions === 'object' || !methodOrOptions) {
-         // Default to init
-         return methods.init.apply(this, arguments);
-      }
-      else {
-         $.error( 'jQueryTagsInput method "' +  methodOrOptions + '" does not exist' );
-      }
-      console.log(methods);
-      return false;
-
-      // Do a deep copy of the options
-      options = $.extend(true, {}, defaults, options);
-
-      console.log(options);
-
+   $.fn.tagsInput = $.fn.tagsinput = function(opts) {
       return this.each(function() {
-         var $this = $(this);
-         // Create a new instance for each element in the matched jQuery set
-         // Also save the instance so it can be accessed later to use methods/properties etc
-         // e.g.
-         //    var instance = $('.element').data('plugin');
-         //    instance.someMethod();
-         $this.data('tagsinput', new Plugin($this, options));
-      });
-   };
+         var instance = new Plugin.Main();
+         instance.opts = opts;
+         instance.$ = $(this);
+         instance.run();
+         instance.$.data('tagsinput', instance);
+      }).parent();
+   }
 
-   // Expose defaults and Constructor (allowing overriding of prototype methods for example)
-   $.fn.tagsInput.defaults = defaults;
-   $.fn.tagsInput.Plugin = Plugin;
+
+   // var this.$;
+   // var elementData = {};
+   // var delimiter = [];
+   // var delimiterRegex = '/[\s,]+/';
+   // var tagsCallbacks = [];
+
+   // // Default options
+   // var options = {};
+   // var defaults = {
+   //    // Config
+   //    interactive: true,
+   //    defaultText: 'add a tag',
+   //    minChars: 0,
+   //    delimiter: [',', ';'],
+   //    joinDelimiter: ',',
+   //    unique: true,
+   //    removeWithBackspace: true,
+
+   //    // UI
+   //    width: '300px',
+   //    height: '100px',
+   //    hide: true,
+   //    placeholderColor: '#666666',
+   //    autosize: true,
+   //    comfortZone: 20,
+   //    inputPadding: 6 * 2,
+
+   //    // Autocomplete
+   //    autocomplete: {
+   //       selectFirst: true
+   //    }
+
+   //    // Hooks
+   // };
+
+   // // Create the jQuery plugin
+   // $.fn.tagsInput = function(methodOrOptions) {
+   //    // Call method if it exists
+   //    if (methods[methodOrOptions]) {
+   //       var args = Array.prototype.slice.call(arguments, 1);
+   //       var id = $(this).attr('id');
+   //       args.splice(0, 0, '#' + id);
+   //       return methods[methodOrOptions].apply(this, args);
+   //    }
+   //    else if (typeof methodOrOptions === 'object' || !methodOrOptions) {
+   //       // Default to init
+   //       return methods.init.apply(this, arguments);
+   //    }
+   //    else {
+   //       $.error( 'jQueryTagsInput method "' +  methodOrOptions + '" does not exist' );
+   //    }
+   //    console.log(methods);
+   //    return false;
+
+   //    // Do a deep copy of the options
+   //    options = $.extend(true, {}, defaults, options);
+
+   //    console.log(options);
+
+   //    return this.each(function() {
+   //       var $this = $(this);
+   //       // Create a new instance for each element in the matched jQuery set
+   //       // Also save the instance so it can be accessed later to use methods/properties etc
+   //       // e.g.
+   //       //    var instance = $('.element').data('plugin');
+   //       //    instance.someMethod();
+   //       $this.data('tagsinput', new Plugin($this, options));
+   //    });
+   // };
+
+   // // Expose defaults and Constructor (allowing overriding of prototype methods for example)
+   // $.fn.tagsInput.defaults = defaults;
+   // $.fn.tagsInput.Plugin = Plugin;
 }));
