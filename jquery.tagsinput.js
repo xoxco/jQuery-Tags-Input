@@ -183,7 +183,7 @@
       height:'100px',
       autocomplete: {selectFirst: false },
       hide:true,
-      delimiter:[',',';'],
+      delimiter: ',',
       unique:true,
       removeWithBackspace:true,
       placeholderColor:'#666666',
