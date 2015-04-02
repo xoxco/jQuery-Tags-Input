@@ -98,6 +98,6 @@ option to false.
 	   'delimiter': [',',';'],
 	   'removeWithBackspace' : true,
 	   'minChars' : 0,
-	   'maxChars' : 0 //if not provided there is no limit,
+	   'maxChars' : 0, //if not provided there is no limit
 	   'placeholderColor' : '#666666'
 	});
