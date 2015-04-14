@@ -192,13 +192,15 @@
       inputPadding: 6*2
     },options);
 
+    	var uniqueIdCounter = 0;
+
 		this.each(function() {
 			if (settings.hide) {
 				$(this).hide();
 			}
 			var id = $(this).attr('id');
 			if (!id || delimiter[$(this).attr('id')]) {
-				id = $(this).attr('id', 'tags' + new Date().getTime()).attr('id');
+				id = $(this).attr('id', 'tags' + new Date().getTime() + (uniqueIdCounter++)).attr('id');
 			}
 
 			var data = jQuery.extend({
