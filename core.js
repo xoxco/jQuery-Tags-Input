@@ -90,13 +90,13 @@
 
       // Define our abstract functions
       Plugin.addTag = function() {};
-      Plugin.importTags = function() {
-      };
+      Plugin.removeTag = function() {};
+      Plugin.removeAll = function() {};
+      Plugin.importTags = function() {};
       Plugin.updateTagsField = function() {};
       Plugin.tagExists = function() {};
-      Plugin.removeTag = function() {};
       Plugin.destroy = function() {};
-      Plugin.export = function() {};
+      Plugin.items = function() {};
 
       Plugin.run = function(options) {
          // If we've already instanciated the element, return
