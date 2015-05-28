@@ -167,12 +167,12 @@
 		return (jQuery.inArray(val, tagslist) >= 0); //true when tag exists, false when not
 	};
 
-	// clear all existing tags and import new ones from a string
-	$.fn.importTags = function(str) {
-                id = $(this).attr('id');
-		$('#'+id+'_tagsinput .tag').remove();
-		$.fn.tagsInput.importTags(this,str);
-	}
+   // clear all existing tags and import new ones from a string
+   $.fn.importTags = function(str) {
+      var id = $(this).attr('id');
+      $('#'+id+'_tagsinput .tag').remove();
+      $.fn.tagsInput.importTags(this,str);
+   }
 
 	$.fn.tagsInput = function(options) {
     var settings = jQuery.extend({
