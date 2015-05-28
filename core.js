@@ -49,6 +49,9 @@
          unique: true,
          removeWithBackspace: true,
          readOnly: false,
+         maxTags: null, // @TODO
+         maxChars: null,   // @TODO
+         caseSensitive: false,   // @TODO
 
          // UI
          width: '300px',
@@ -62,9 +65,22 @@
          // Autocomplete
          autocomplete: {
             selectFirst: true
-         }
+         },
 
-         // Hooks
+         // @TODO: Hooks
+
+         // General Hooks
+         afterInit: function() {},
+
+         // Add Tag Hooks
+         beforeAddTag: function() {},
+         onAddTag: function() {},
+         afterAddTag: function() {},
+
+         // Remove Tag Hooks
+         beforeRemoveTag: function() {},
+         onRemoveTag: function() {},
+         afterRemoveTag: function() {}
       }
    };
 
