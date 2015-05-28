@@ -17,12 +17,14 @@
       }
 
       $(function() {
-         var i = $('.tags_1').tagsInput();
-         // i.addTag('asd, asd, asd');
-         console.log(i);
+         var i = $('.tags_1').tagsInput({readOnly: true});
+         // $('.tags_1').tagsInput('addTag', 'asd111');
+         // console.log(i);
          // var instance = $('.tags_1').data('tagsInput');
          // instance.init2();
          // console.log(instance);
+         console.warn($('.tags_1').tagsInput('items'));
+         // $('.tags_1').tagsInput('importTags', 'asdasd, asdasdasd; asdsds', {removeAll: true});
          // $('.tags_1').tagsInput('importTags', 'asdasd, asdasdasd; asdsds');
       });
 

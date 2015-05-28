@@ -33,9 +33,12 @@
       $realInput: null,
       delimiter : [],
       elementData : {},
+      itemsArray: [],
+      config: {
+         tags: '.tag'
+      },
       defaultOpts : {
          // Config
-         interactive: true,
          defaultText: 'add a tag',
          minChars: 0,
          // delimiter: [',', ';'],
@@ -45,6 +48,7 @@
          joinDelimiter: ',',
          unique: true,
          removeWithBackspace: true,
+         readOnly: false,
 
          // UI
          width: '300px',
@@ -70,14 +74,15 @@
 
       // Define our abstract functions
       Plugin.addTag = function() {};
-      Plugin.importTags = function() {};
+      Plugin.importTags = function() {
+      };
       Plugin.updateTagsField = function() {};
       Plugin.tagExists = function() {};
       Plugin.removeTag = function() {};
       Plugin.destroy = function() {};
       Plugin.export = function() {};
 
-      Plugin.run = function() {
+      Plugin.run = function(options) {
          // If we've already instanciated the element, return
          if (Plugin.core.$.data('tagsinput-init-complete')) {
             return;
@@ -85,7 +90,7 @@
          Plugin.core.$.data('tagsinput-init-complete', true);
 
          // Configure the options
-         Plugin.opts = $.extend(true, {}, Plugin.core.defaultOpts, Plugin.opts);
+         Plugin.opts = $.extend(true, {}, Plugin.core.defaultOpts, options);
 
          // Plugin.listen();
          Plugin.init();
@@ -156,11 +161,15 @@
             // Add the tag
             if (tagValue !== '' && skipTag === false) {
                // Create the remove tag element
-               var anchorTagAttrs = {
-                  href: '#',
-                  title: 'Remove tag',
-                  text: 'x'
-               };
+               var anchorTagAttrs = {};
+               if (Plugin.opts.readOnly !== true) {
+                  anchorTagAttrs = {
+                     href: '#',
+                     title: 'Remove tag',
+                     text: 'x'
+                  };
+               }
+
                var anchorTag = $('<a>', anchorTagAttrs).click(function(e) {
                   return methods['removeTag', id, escape(tagValue)];
                });
@@ -189,6 +198,9 @@
 
                // Update the hidden tags field
                _updateTagsField.call(Plugin, tags);
+
+               // Set the tags array
+               Plugin.itemsArray = tags;
 
                // @TODO: Callbacks
                // if (options.callback && tags_callbacks[id] && tags_callbacks[id]['onAddTag']) {
@@ -233,6 +245,17 @@
          });
       };
 
+      var _removeAll = function() {
+         // Reset the items array
+         Plugin.itemsArray = [];
+
+         // Empty the hidden input
+         $(Plugin.elementData.realInput).val('');
+
+         // Remove the actual tag from the DOM
+         $(Plugin.core.config.tags).remove();
+      };
+
       var _tagExists = function(tag) {
          var id = Plugin.core.$.attr('id');
          var tags = $(Plugin.elementData.realInput).val().split(Plugin.opts.delimiterRegex);
@@ -260,7 +283,7 @@
          var id = Plugin.core.$.attr('id');
          var markup = '<div id="' + id + '_tagsinput" class="tagsinput"><div id="' + id +'_addTag">';
 
-         if (Plugin.opts.interactive) {
+         if (Plugin.opts.readOnly !== true) {
             markup = markup + '<input id="' + id + '_tag" value="" data-default="' + Plugin.opts.defaultText + '" />';
          }
 
@@ -428,7 +451,7 @@
             _importTags.call(Plugin, realInputValue);
          }
 
-         if (Plugin.opts.interactive) {
+         if (Plugin.opts.readOnly !== true) {
             // Set the default text and color
             _resetInput.call(Plugin);
 
@@ -522,38 +545,68 @@
                   }
                });
             }
-         } // End settings.interactive
+         } // End settings.readOnly
       };
 
-      this.addTag = function(tags) {
+      Plugin.addTag = function(tags) {
          _addTag.call(this, tags);
+      };
+
+      Plugin.items = function() {
+         return Plugin.itemsArray;
+      };
+
+      Plugin.removeAll = function() {
+         _removeAll();
+      };
+
+      Plugin.importTags = function(tags, options) {
+         if (options.removeAll) {
+            _removeAll();
+         }
+         // _addTag.call(this, tags);
          // console.log(test2);
       };
    };
 
-   $.fn.tagsInput = $.fn.tagsinput = function(methodOrOptions, methodArgs) {
-      return this.each(function() {
-         var instance = new PluginBase.Main();
+   $.fn.tagsInput = $.fn.tagsinput = function(methodOrOptions, methodArgs, methodOpts) {
+      var results = [];
+
+      this.each(function() {
+         // Use an existing plugin instance from the element if we have one. If not, create a new instance
+         var elementDataInstance = $(this).data('tagsInput');
+         var instance = (elementDataInstance === undefined) ? new PluginBase.Main() : elementDataInstance;
+         methodOpts = methodOpts || {};
 
          // Calling an existing method
          if (typeof methodOrOptions === 'string' && instance[methodOrOptions]) {
             var args = Array.prototype.slice.call(arguments, 1);
             var id = $(this).attr('id');
             args.splice(0, 0, methodArgs);
-            return instance[methodOrOptions].apply(instance, args);
-         }
-         else if (typeof methodOrOptions === 'object' || !methodOrOptions) {
+            args.splice(1, 0, methodOpts);
+            var retVal = instance[methodOrOptions].apply(instance, args);
+
+            if (retVal !== undefined) {
+               results.push(retVal);
+            }
+            // return instance[methodOrOptions].apply(instance, args);
+         } else if (typeof methodOrOptions === 'object' || !methodOrOptions) {
             // Default to init
-            instance.core.opts = methodOrOptions;
             instance.core.$ = $(this);
-            instance.run();
+            instance.run(methodOrOptions);
 
             // Set the element's plugin data
             instance.core.$.data('tagsInput', instance);
-         }
-         else {
+         } else {
             $.error( 'jQueryTagsInput method "' +  methodOrOptions + '" does not exist' );
          }
       }).data(pluginName);
+
+      // If we made a function call, return the results
+      if (typeof methodOrOptions === 'string') {
+         return results.length > 1 ? results : results[0];
+      } else {
+         return results;
+      }
    };
 }));
