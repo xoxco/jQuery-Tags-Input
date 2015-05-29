@@ -444,7 +444,7 @@
          Plugin.elementData = jQuery.extend({
             pid            : id,
             realInput      : '#' + id,
-            holder         : '#' + id + '_tagsinput',
+            container      : '#' + id + '_tagsinput',
             inputWrapper   : '#' + id + '_addTag',
             fakeInput      : '#' + id + '_tag'
          }, Plugin.opts);
@@ -458,11 +458,12 @@
          _displayMarkup.call(Plugin);
 
          // Get the jquery objects for our elements
-         var $realInput = $(Plugin.elementData.realInput);
-         var $fakeInput = $(Plugin.elementData.fakeInput);
+         Plugin.core.$realInput = $(Plugin.elementData.realInput);
+         Plugin.core.$fakeInput = $(Plugin.elementData.fakeInput);
+         Plugin.core.$container = $(Plugin.elementData.container);
 
          // Import initial tags if we have any
-         var realInputValue = $realInput.val()
+         var realInputValue = Plugin.core.$realInput.val()
          if (realInputValue !== '') {
             _importTags.call(Plugin, realInputValue);
          }
@@ -476,18 +477,18 @@
 
             // Set the focus on the field when clicking on the container
             $(Plugin.elementData.holder).bind('click', function(e) {
-               $fakeInput.focus();
+               Plugin.core.$fakeInput.focus();
             });
 
             // When the field is focused, empty it if it contains the prompt text
-            $fakeInput.bind('focus',function(e) {
-               if ($fakeInput.val() === $fakeInput.attr('data-default')) {
+            Plugin.core.$fakeInput.bind('focus',function(e) {
+               if (Plugin.core.$fakeInput.val() === Plugin.core.$fakeInput.attr('data-default')) {
                   $(Plugin.elementData.fakeInput).val('');
                }
-               $fakeInput.css('color','#000000');
+               Plugin.core.$fakeInput.css('color','#000000');
             });
 
-            $fakeInput.bind('keypress', function(e) {
+            Plugin.core.$fakeInput.bind('keypress', function(e) {
                var $self = $(this);
                // Check if the character typed is a delimiter
                if (_checkDelimiter.call(Plugin, e)) {
@@ -503,7 +504,7 @@
                   }
                   return false;
                } else if (Plugin.opts.autosize) {
-                  // $fakeInput.trigger('resetAutosize');
+                  // Plugin.core.$fakeInput.trigger('resetAutosize');
                   _doAutosize.call(Plugin);
                      // @TODO: Need to add this as a trigger in "listen"
                }
@@ -515,11 +516,11 @@
             } else {
                // if a user tabs out of the field, create a new tag
                // this is only available if autocomplete is not used.
-               $fakeInput.bind('blur', function(event) {
+               Plugin.core.$fakeInput.bind('blur', function(event) {
                   var defaultText = $(this).attr('data-default');
 
                   // If the field is not empty and does not equal the default text
-                  var currentValue = $fakeInput.val();
+                  var currentValue = Plugin.core.$fakeInput.val();
                   if (currentValue !== '' && currentValue !== defaultText) {
                      // If the text passes length validation, add it
                      if (_validateTagLength.call(Plugin, currentValue)) {
@@ -551,11 +552,11 @@
             }
 
             // Remove the focus from the field
-            $fakeInput.blur();
+            Plugin.core.$fakeInput.blur();
 
             // Remove the not_valid class when user changes the value of the fake input
             if (Plugin.opts.unique) {
-               $fakeInput.keydown(function(e) {
+               Plugin.core.$fakeInput.keydown(function(e) {
                   if(e.keyCode == 8 || String.fromCharCode(e.which).match(Plugin.opts.alphaNumRegex)) {
                      $fakeInput.removeClass('not_valid');
                   }
@@ -574,6 +575,13 @@
 
       Plugin.removeAll = function() {
          _removeAll();
+      };
+
+      Plugin.destroy = function() {
+         console.log(Plugin.core);
+         Plugin.core.$container.remove();
+         Plugin.core.$realInput.show();
+         Plugin.core.$realInput.removeData('tagsInput');
       };
 
       Plugin.importTags = function(tags, options) {
