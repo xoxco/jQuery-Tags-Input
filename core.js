@@ -109,7 +109,7 @@
          Plugin.init();
 
          // We're done init so set the flag
-         Plugin.isInit = false;
+         Plugin.core.isInit = false;
       };
    };
 
@@ -139,6 +139,11 @@
       var _addTag = function(tagValue, options) {
          // Make sure we can add the new tag
          if (_maxTagsReached()) {
+            // Only show an error state if we are adding a tag, not on import.
+            // On import, we'll just drop the other tags silently
+            if (Plugin.core.isInit === false) {
+               _displayError();
+            }
             return false;
          }
 
@@ -364,6 +369,14 @@
          $(Plugin.elementData.realInput).val(tagsArray.join(Plugin.opts.joinDelimiter));
       };
 
+      var _displayError = function() {
+         Plugin.core.$fakeInput.addClass('not_valid');
+      };
+
+      var _hideError = function() {
+         Plugin.core.$fakeInput.removeClass('not_valid');
+      };
+
       var _resetInput = function() {
          var $fakeInput = $(Plugin.elementData.fakeInput);
          $fakeInput.val( $fakeInput.attr('data-default') );
@@ -496,17 +509,20 @@
 
             Plugin.core.$fakeInput.bind('keypress', function(e) {
                var $self = $(this);
+               var tag = $self.val();
                // Check if the character typed is a delimiter
                if (_checkDelimiter.call(Plugin, e)) {
                   e.preventDefault();
 
                   // Validate the length of the tag and add if valid
-                  var tag = $self.val();
                   if (_validateTagLength.call(Plugin, tag)) {
                      _addTag.call(this, tag, {focus: true, unique: (Plugin.opts.unique)});
                      // $self.trigger('resetAutosize');
                      _resetAutosize.call(Plugin);
                      // @TODO: Need to add this as a trigger in "listen"
+                  } else {
+                     // Tag is too short or too long
+                     _displayError();
                   }
                   return false;
                } else if (Plugin.opts.autosize) {
@@ -523,13 +539,15 @@
                // if a user tabs out of the field, create a new tag
                // this is only available if autocomplete is not used.
                Plugin.core.$fakeInput.bind('blur', function(event) {
-                  var defaultText = $(this).attr('data-default');
+                  var $self = $(this);
+                  var defaultText = $self.attr('data-default');
 
                   // If the field is not empty and does not equal the default text
                   var currentValue = Plugin.core.$fakeInput.val();
                   if (currentValue !== '' && currentValue !== defaultText) {
                      // If the text passes length validation, add it
                      if (_validateTagLength.call(Plugin, currentValue)) {
+                        var tag = $self.val();
                         _addTag.call(this, tag, {focus: true, unique: (Plugin.opts.unique)});
                      }
                   } else {
@@ -543,6 +561,11 @@
             // Delete last tag on backspace
             if (Plugin.opts.removeWithBackspace) {
                $(Plugin.elementData.fakeInput).bind('keydown', function(e) {
+                  // Remove the error class
+                  // @TODO: Need to make sure that hitting keys such as shift, alt, control, etc...
+                  // does not reset the error. Or is this overkill?
+                  _hideError();
+
                   var $self = $(this);
                   if (e.keyCode == 8 && $self.val() == '') {
                      e.preventDefault();
@@ -564,7 +587,7 @@
             if (Plugin.opts.unique) {
                Plugin.core.$fakeInput.keydown(function(e) {
                   if(e.keyCode == 8 || String.fromCharCode(e.which).match(Plugin.opts.alphaNumRegex)) {
-                     $fakeInput.removeClass('not_valid');
+                     Plugin.core.$fakeInput.removeClass('not_valid');
                   }
                });
             }
