@@ -17,7 +17,10 @@
       }
 
       $(function() {
-         var i = $('.tags_1').tagsInput({readOnly: false});
+         var i = $('.tags_1').tagsInput({
+            readOnly: false,
+            maxTags: 3
+         });
          // $('.tags_1').tagsInput('addTag', 'asd111');
          // console.log(i);
          // var instance = $('.tags_1').data('tagsInput');

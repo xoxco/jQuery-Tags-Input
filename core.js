@@ -1,7 +1,4 @@
 /*
- * 'Highly configurable' mutable plugin boilerplate
- * Author: @markdalgleish
- * Further changes, comments: @addyosmani
  * Licensed under the MIT license
  */
 
@@ -17,7 +14,7 @@
       // Browser globals
       factory(root.jQuery);
    }
-}(this, function($) {
+}(this, function($, undefined) {
    'use strict';
    var pluginName = 'tagsInput';
 
@@ -49,7 +46,7 @@
          unique: true,
          removeWithBackspace: true,
          readOnly: false,
-         maxTags: null, // @TODO
+         maxTags: null,
          maxChars: null,   // @TODO
          caseSensitive: false,   // @TODO
 
@@ -140,6 +137,11 @@
       };
 
       var _addTag = function(tagValue, options) {
+         // Make sure we can add the new tag
+         if (_maxTagsReached()) {
+            return false;
+         }
+
          // Trim the new tag before continuing
          tagValue = jQuery.trim(tagValue);
 
@@ -216,7 +218,7 @@
                _updateTagsField.call(Plugin, tags);
 
                // Set the tags array
-               Plugin.itemsArray = tags;
+               Plugin.core.itemsArray = tags;
 
                // @TODO: Callbacks
                // if (options.callback && tags_callbacks[id] && tags_callbacks[id]['onAddTag']) {
@@ -242,7 +244,6 @@
             var $self = $(this);
             var id = $self.attr('id');
             var old = $self.val().split(Plugin.opts.delimiterRegex);
-            console.log(old);
 
             $('#' + id + '_tagsinput .tag').remove();
             for (var i = 0; i < old.length; i++) {
@@ -263,7 +264,7 @@
 
       var _removeAll = function() {
          // Reset the items array
-         Plugin.itemsArray = [];
+         Plugin.core.itemsArray = [];
 
          // Empty the hidden input
          $(Plugin.elementData.realInput).val('');
@@ -289,6 +290,12 @@
          }
 
          return id;
+      };
+
+      var _maxTagsReached = function() {
+         // No need to check for max tags
+         if (Plugin.opts.maxTags === null) { return false; }
+         return (Plugin.core.itemsArray.length >= Plugin.opts.maxTags);
       };
 
       var _hide = function() {
@@ -431,7 +438,6 @@
       // ====================================================
 
       Plugin.init = function() {
-         console.log(Plugin.opts);
          // Hide the element if the option is set
          if (Plugin.opts.hide) {
             _hide.call(Plugin);
@@ -570,7 +576,7 @@
       };
 
       Plugin.items = function() {
-         return Plugin.itemsArray;
+         return Plugin.core.itemsArray;
       };
 
       Plugin.removeAll = function() {
@@ -578,7 +584,6 @@
       };
 
       Plugin.destroy = function() {
-         console.log(Plugin.core);
          Plugin.core.$container.remove();
          Plugin.core.$realInput.show();
          Plugin.core.$realInput.removeData('tagsInput');
