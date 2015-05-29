@@ -48,7 +48,7 @@
          readOnly: false,
          maxTags: null,
          maxChars: null,   // @TODO
-         caseSensitive: false,   // @TODO
+         caseSensitive: true,   // @TODO
 
          // UI
          width: '300px',
@@ -280,9 +280,21 @@
 
       var _tagExists = function(tag) {
          var id = Plugin.core.$.attr('id');
-         var tags = $(Plugin.elementData.realInput).val().split(Plugin.opts.delimiterRegex);
+         var tagFound = false;
 
-         return (jQuery.inArray(tag, tags) >= 0);
+         // Compare the new tag against the existing tags
+         if (Plugin.opts.caseSensitive) {
+            return ($.inArray(tag, Plugin.core.itemsArray) >= 0);
+         } else {
+            // Compare the lowercase new tag against the existing tags, all in lowercase
+            $.each(Plugin.core.itemsArray, function(index, existingTag) {
+               if (tag.toLowerCase() === existingTag.toLowerCase()) {
+                  tagFound = true;
+               }
+            });
+         }
+
+         return tagFound;
       };
 
       var _generateId = function() {
