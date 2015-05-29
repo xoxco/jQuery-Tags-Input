@@ -139,8 +139,6 @@
                _addTag(tagValue, {});
             });
          }
-
-         // @TODO: onAdd event, onChange?
       };
 
       var _setTagSource = function(source) {
@@ -213,6 +211,7 @@
                // Create the inner span element
                var innerSpan = $('<span>')
                   .text(tagValue)
+                  .attr('data-tag-value', tagValue)
                   .append('&nbsp;&nbsp;');
 
                // Create the outer span element
@@ -253,31 +252,60 @@
          });
       };
 
-      var _removeTag = function(tag) {
+      var _removeTag = function(tag, options) {
+         options = $.extend({
+            skipBeforeCallback: false,
+            skipAfterCallback: false
+         }, Plugin.opts, options);
+
+         // Call the "beforeRemoveTags" callback
+         if (options.skipBeforeCallback === false) {
+            _beforeRemoveTagsCallback(tag);
+         }
+
          var str;
          tag = unescape(tag);
 
          Plugin.core.$.each(function() {
-            str = '';
+            var tagsString = '';
             var $self = $(this);
             var id = $self.attr('id');
-            var old = $self.val().split(Plugin.opts.delimiterRegex);
+            var items = Plugin.core.itemsArray;
 
-            $('#' + id + '_tagsinput .tag').remove();
-            for (var i = 0; i < old.length; i++) {
-               if (old[i] !== tag) {
-                  str = str + Plugin.core.delimiter[id] + old[i];
+            for (var i = 0; i < items.length; i++) {
+               if (items[i] !== tag) {
+                  tagsString = tagsString + items[i] + Plugin.core.delimiter[id];
                }
             }
 
-            _importTags(str);
+            // Remove the last delimiter
+            tagsString = tagsString.substring(0, tagsString.length - 1);
 
-            // @TODO
-            // if (tags_callbacks[id] && tags_callbacks[id]['onRemoveTag']) {
-            //    var f = tags_callbacks[id]['onRemoveTag'];
-            //    f.call(this, tag);
-            // }
+            // Remove the tag from the itemsArray and DOM
+            var index;
+            if (Plugin.opts.unique) {
+               index = Plugin.core.itemsArray.indexOf(tag);
+               if (index > -1) {
+                  Plugin.core.itemsArray.splice(index, 1);
+                  $(Plugin.core.$container.find('span[data-tag-value="' + tag + '"]')).parent().remove();
+               }
+            } else {
+               $.each(itemsArray, function(index, existingTag) {
+                  if (tag === existingTag) {
+                     index = Plugin.core.itemsArray.indexOf(existingTag);
+                     if (index > -1) {
+                        Plugin.core.itemsArray.splice(index, 1);
+                        $(Plugin.core.$container.find('span[data-tag-value="' + existingTag + '"]')).parent().remove();
+                     }
+                  }
+               });
+            }
          });
+
+         // Call the "afterRemoveTags" callback
+         if (options.skipAfterCallback === false) {
+            _afterRemoveTagsCallback(tag);
+         }
       };
 
       var _removeAll = function() {
@@ -408,9 +436,21 @@
          }
       };
 
-      var _afterImportTagsCallback = function(tags) {
+      var _afterRemoveTagsCallback = function(tag) {
+         if (typeof Plugin.opts.afterRemoveTag === 'function') {
+            Plugin.opts.afterRemoveTag.call(this, tag, Plugin.core.itemsArray, Plugin.core.tagSource);
+         }
+      };
+
+      var _beforeRemoveTagsCallback = function(tag) {
+         if (typeof Plugin.opts.beforeRemoveTag === 'function') {
+            Plugin.opts.beforeRemoveTag.call(this, tag, Plugin.core.itemsArray, Plugin.core.tagSource);
+         }
+      };
+
+      var _afterImportTagsCallback = function(tag) {
          if (typeof Plugin.opts.afterImportTag === 'function') {
-            Plugin.opts.afterImportTag.call(this, tags, Plugin.core.itemsArray, Plugin.core.tagSource);
+            Plugin.opts.afterImportTag.call(this, tag, Plugin.core.itemsArray, Plugin.core.tagSource);
          }
       };
 
@@ -647,6 +687,10 @@
          // Set the tag source
          _setTagSource('add');
          _addTag(tags);
+      };
+
+      Plugin.removeTag = function(tag, options) {
+         _removeTag(tag, options);
       };
 
       Plugin.items = function() {
