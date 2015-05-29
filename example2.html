@@ -21,9 +21,17 @@
             readOnly: false,
             maxTags: null,
             maxChars: null,
-            afterInit: function(tags) {
-               // console.log(plugin);
-               // console.log('running afterInit');
+            beforeImportTag: function(tag, items, source) {
+               console.log('running before cb');
+               console.log(tag);
+               console.log(items);
+               console.log(source);
+            },
+            afterImportTag: function(tag, items, source) {
+               console.log('running after cb');
+               console.log(tag);
+               console.log(items);
+               console.log(source);
             }
          });
          // $('.tags_1').tagsInput('addTag', 'asd111');

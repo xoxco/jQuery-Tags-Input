@@ -26,14 +26,13 @@
       isInit : true,
       opts : null,
       $ : null,
-      $fakeInput: null,
-      $realInput: null,
       delimiter : [],
       elementData : {},
       itemsArray: [],
       config: {
          tags: '.tag'
       },
+      tagSource: 'user', // Where did the tag come from? [user, import, add, autocomplete]
       defaultOpts : {
          // Config
          defaultText: 'add a tag',
@@ -71,12 +70,14 @@
 
          // Add Tag Hooks
          beforeAddTag: function() {},
-         onAddTag: function() {},
          afterAddTag: function() {},
+
+         // Import Tag Hooks
+         beforeImportTag: function() {},
+         afterImportTag: function() {},
 
          // Remove Tag Hooks
          beforeRemoveTag: function() {},
-         onRemoveTag: function() {},
          afterRemoveTag: function() {}
       }
    };
@@ -135,11 +136,15 @@
          var tags = tags.split(Plugin.opts.delimiterRegex);
          if (tags.length) {
             $.each(tags, function(index, tagValue) {
-               _addTag.call(Plugin, tagValue, {});
+               _addTag(tagValue, {});
             });
          }
 
          // @TODO: onAdd event, onChange?
+      };
+
+      var _setTagSource = function(source) {
+         Plugin.core.tagSource = source;
       };
 
       var _addTag = function(tagValue, options) {
@@ -158,8 +163,9 @@
 
          options = jQuery.extend({
             focus: false,
-            callback: false
-         }, options);
+            callback: false,
+            unique: false
+         }, Plugin.opts, options);
 
          Plugin.core.$.each(function() {
             var id = Plugin.core.$.attr('id');
@@ -180,10 +186,11 @@
             // Check for uniqueness if this option is enabled
             var skipTag = false;
             if (options.unique) {
-               skipTag = _tagExists.call(this, tagValue);
-               if (skipTag) {
-                  // @TODO: Move these into an elements holder
-                  $('#' + id + '_tag').addClass('not_valid');
+               skipTag = _tagExists(tagValue);
+
+               // Only show the error if we are not importing tags
+               if (skipTag && Plugin.core.tagSource !== 'import') {
+                  _displayError();
                }
             }
 
@@ -226,7 +233,7 @@
                }
 
                // Update the hidden tags field
-               _updateTagsField.call(Plugin, tags);
+               _updateTagsField(tags);
 
                // Set the tags array
                Plugin.core.itemsArray = tags;
@@ -263,7 +270,7 @@
                }
             }
 
-            _importTags.call(Plugin, str);
+            _importTags(str);
 
             // @TODO
             // if (tags_callbacks[id] && tags_callbacks[id]['onRemoveTag']) {
@@ -395,6 +402,18 @@
          Plugin.core.$fakeInput.removeClass('not_valid');
       };
 
+      var _beforeImportTagsCallback = function(tags) {
+         if (typeof Plugin.opts.beforeImportTag === 'function') {
+            Plugin.opts.beforeImportTag.call(this, tags, Plugin.core.itemsArray, Plugin.core.tagSource);
+         }
+      };
+
+      var _afterImportTagsCallback = function(tags) {
+         if (typeof Plugin.opts.afterImportTag === 'function') {
+            Plugin.opts.afterImportTag.call(this, tags, Plugin.core.itemsArray, Plugin.core.tagSource);
+         }
+      };
+
       var _resetInput = function() {
          var $fakeInput = $(Plugin.elementData.fakeInput);
          $fakeInput.val( $fakeInput.attr('data-default') );
@@ -471,11 +490,11 @@
       Plugin.init = function() {
          // Hide the element if the option is set
          if (Plugin.opts.hide) {
-            _hide.call(Plugin);
+            _hide();
          }
 
          // Generate an ID for the element if it does not have one
-         var id = _generateId.call(Plugin);
+         var id = _generateId();
 
          // Create the delimiter data object
          Plugin.elementData = jQuery.extend({
@@ -489,10 +508,10 @@
          Plugin.core.delimiter[id] = Plugin.elementData.delimiter;
 
          // Modify the delimiter regex if need be
-         _updateDelimiterRegex.call(Plugin);
+         _updateDelimiterRegex();
 
          // Setup and show the markup
-         _displayMarkup.call(Plugin);
+         _displayMarkup();
 
          // Get the jquery objects for our elements
          Plugin.core.$realInput = $(Plugin.elementData.realInput);
@@ -502,15 +521,15 @@
          // Import initial tags if we have any
          var realInputValue = Plugin.core.$realInput.val()
          if (realInputValue !== '') {
-            _importTags.call(Plugin, realInputValue);
+            _importTags(realInputValue);
          }
 
          if (Plugin.opts.readOnly !== true) {
             // Set the default text and color
-            _resetInput.call(Plugin);
+            _resetInput();
 
             // Setup the autosize listener
-            _resetAutosize.call(Plugin);
+            _resetAutosize();
 
             // Set the focus on the field when clicking on the container
             $(Plugin.elementData.holder).bind('click', function(e) {
@@ -529,14 +548,18 @@
                var $self = $(this);
                var tag = $self.val();
                // Check if the character typed is a delimiter
-               if (_checkDelimiter.call(Plugin, e)) {
+               if (_checkDelimiter(e)) {
                   e.preventDefault();
 
                   // Validate the length of the tag and add if valid
-                  if (_validateTagLength.call(Plugin, tag)) {
-                     _addTag.call(this, tag, {focus: true, unique: (Plugin.opts.unique)});
+                  if (_validateTagLength(tag)) {
+                     // Set the tag source
+                     _setTagSource('add');
+
+                     // Add the tag
+                     _addTag(this, tag, {focus: true, unique: (Plugin.opts.unique)});
                      // $self.trigger('resetAutosize');
-                     _resetAutosize.call(Plugin);
+                     _resetAutosize();
                      // @TODO: Need to add this as a trigger in "listen"
                   } else {
                      // Tag is too short or too long
@@ -545,7 +568,7 @@
                   return false;
                } else if (Plugin.opts.autosize) {
                   // Plugin.core.$fakeInput.trigger('resetAutosize');
-                  _doAutosize.call(Plugin);
+                  _doAutosize();
                      // @TODO: Need to add this as a trigger in "listen"
                }
             });
@@ -553,6 +576,9 @@
             // Autocomplete
             if (Plugin.autocomplete) {
                // @TODO: autocomplete
+
+               // Set the tag source
+               _setTagSource('autocomplete');
             } else {
                // if a user tabs out of the field, create a new tag
                // this is only available if autocomplete is not used.
@@ -564,13 +590,18 @@
                   var currentValue = Plugin.core.$fakeInput.val();
                   if (currentValue !== '' && currentValue !== defaultText) {
                      // If the text passes length validation, add it
-                     if (_validateTagLength.call(Plugin, currentValue)) {
+                     if (_validateTagLength(currentValue)) {
                         var tag = $self.val();
-                        _addTag.call(this, tag, {focus: true, unique: (Plugin.opts.unique)});
+
+                        // Set the tag source
+                        _setTagSource('add');
+
+                        // Add the tag
+                        _addTag(tag, {focus: true, unique: (Plugin.opts.unique)});
                      }
                   } else {
                      // Reset the default text and color
-                     _resetInput.call(this);
+                     _resetInput();
                   }
                   return false;
                });
@@ -592,7 +623,7 @@
                      last_tag = last_tag.replace(/[\s]+x$/, '');
 
                      // Remove the tag
-                     _removeTag.call(this, escape(last_tag));
+                     _removeTag(escape(last_tag));
                      $self.trigger('focus');
                   }
                });
@@ -613,7 +644,9 @@
       };
 
       Plugin.addTag = function(tags) {
-         _addTag.call(this, tags);
+         // Set the tag source
+         _setTagSource('add');
+         _addTag(tags);
       };
 
       Plugin.items = function() {
@@ -631,11 +664,35 @@
       };
 
       Plugin.importTags = function(tags, options) {
+         options = $.extend({
+            unique: false,
+            skipBeforeCallback: false,
+            skipAfterCallback: false,
+            removeAll: false
+         }, Plugin.opts, options);
+
+         // Set the tag source
+         _setTagSource('import');
+
+         // Call the "beforeImportTags" callback
+         if (options.skipBeforeCallback === false) {
+            _beforeImportTagsCallback(tags);
+         }
+
+         // Remove the existing tags if need be
          if (options.removeAll) {
             _removeAll();
          }
-         // _addTag.call(this, tags);
-         // console.log(test2);
+
+         // Import the tags one by one
+         $.each(tags, function(index, tag) {
+            _addTag(tag, options);
+         });
+
+         // Call the "afterImportTags" callback
+         if (options.skipAfterCallback === false) {
+            _afterImportTagsCallback(tags);
+         }
       };
    };
 
