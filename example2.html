@@ -20,7 +20,11 @@
          var i = $('.tags_1').tagsInput({
             readOnly: false,
             maxTags: null,
-            maxChars: null
+            maxChars: null,
+            afterInit: function(tags) {
+               // console.log(plugin);
+               // console.log('running afterInit');
+            }
          });
          // $('.tags_1').tagsInput('addTag', 'asd111');
          // console.log(i);

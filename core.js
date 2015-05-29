@@ -110,6 +110,12 @@
 
          // We're done init so set the flag
          Plugin.core.isInit = false;
+
+         // Call the afterInit callback if it's a function
+         // We pass in the tags that were imported, if any, as the only parameter
+         if (typeof Plugin.opts.afterInit === 'function') {
+            Plugin.opts.afterInit.call(this, Plugin.core.itemsArray);
+         }
       };
    };
 
