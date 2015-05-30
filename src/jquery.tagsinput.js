@@ -195,6 +195,14 @@
     	var uniqueIdCounter = 0;
 
 		this.each(function() {
+         // If we have already initialized the field, do not do it again
+         if (typeof $(this).attr('data-tagsinput-init') !== 'undefined') {
+            return;
+         }
+
+         // Mark the field as having been initialized
+         $(this).attr('data-tagsinput-init', true);
+
 			if (settings.hide) {
 				$(this).hide();
 			}
