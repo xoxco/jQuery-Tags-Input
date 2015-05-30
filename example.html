@@ -1,7 +1,7 @@
 
-	<link rel="stylesheet" type="text/css" href="./jquery.tagsinput.css" />
+	<link rel="stylesheet" type="text/css" href="./src/jquery.tagsinput.css" />
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
-	<script type="text/javascript" src="./jquery.tagsinput.js"></script>
+	<script type="text/javascript" src="./src/jquery.tagsinput.js"></script>
 	<!-- To test using the original jQuery.autocomplete, uncomment the following -->
 	<!--
 	<script type='text/javascript' src='http://xoxco.com/x/tagsinput/jquery-autocomplete/jquery.autocomplete.min.js'></script>
@@ -26,7 +26,9 @@
 
 		$(function() {
 
-			$('#tags_1').tagsInput({width:'auto'});
+			$('#tags_1').tagsInput({
+            width:'auto'
+         });
 			$('#tags_2').tagsInput({
 				width: 'auto',
 				onChange: function(elem, elem_tags)

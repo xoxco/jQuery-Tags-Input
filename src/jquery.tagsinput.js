@@ -355,17 +355,24 @@
     * @returns {boolean}
     * @private
     */
-   var _checkDelimiter = function(event){
-      if(event.which == 13){
-         return true
+   var _checkDelimiter = function(event) {
+      var found = false;
+      if (event.which == 13) {
+         return true;
       }
 
-      for(delimiter in event.data.delimiter){
-         if(event.which == delimiter.charCodeAt(0)){
-            return true
+      if (typeof event.data.delimiter === 'string') {
+         if (event.which == event.data.delimiter.charCodeAt(0)) {
+            found = true;
          }
+      } else {
+         $.each(event.data.delimiter, function(index, delimiter) {
+            if (event.which == delimiter.charCodeAt(0)) {
+               found = true;
+            }
+         });
       }
 
-      return false;
+      return found;
    }
 })(jQuery);

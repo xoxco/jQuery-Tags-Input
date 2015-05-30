@@ -1,0 +1,112 @@
+
+   <link rel="stylesheet" type="text/css" href="./jquery.tagsinput.css" />
+   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+   <script type="text/javascript" src="./typeahead.bundle.js"></script>
+   <script type="text/javascript" src="./core.js"></script>
+   <script type="text/javascript" src="./tagsinput.typeahead.extension.js"></script>
+
+   <script type="text/javascript">
+
+      function onAddTag(tag) {
+         alert("Added a tag: " + tag);
+      }
+      function onRemoveTag(tag) {
+         alert("Removed a tag: " + tag);
+      }
+
+      function onChangeTag(input,tag) {
+         alert("Changed a tag: " + tag);
+      }
+
+      var substringMatcher = function(strs) {
+        return function findMatches(q, cb) {
+          var matches, substringRegex;
+
+          // an array that will be populated with substring matches
+          matches = [];
+
+          // regex used to determine if a string contains the substring `q`
+          substrRegex = new RegExp(q, 'i');
+
+          // iterate through the pool of strings and for any string that
+          // contains the substring `q`, add it to the `matches` array
+          $.each(strs, function(i, str) {
+            if (substrRegex.test(str)) {
+              matches.push(str);
+            }
+          });
+
+          cb(matches);
+        };
+      };
+
+      var states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California',
+        'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii',
+        'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana',
+        'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
+        'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
+        'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota',
+        'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island',
+        'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
+        'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+      ];
+
+      // var c = {
+      //    config: {
+      //       hint: true,
+      //       highlight: true,
+      //       minLength: 1
+      //    },
+      //    options: {
+      //       name: 'states',
+      //       source: substringMatcher(states)
+      //    }
+      // };
+
+
+      $(function() {
+         // $('.tags_2').typeahead(c.config, c.options);
+         var i = $('.tags_1').tagsInput({
+            readOnly: false,
+            maxTags: null,
+            maxChars: null,
+            // beforeRemoveTag: function(tag, items) {
+            //    console.log('running before cb');
+            //    console.log(tag);
+            //    console.log(items);
+            // },
+            // afterRemoveTag: function(tag, items) {
+            //    console.log('running after cb');
+            //    console.log(tag);
+            //    console.log(items);
+            // },
+            plugins: {
+               typeahead: {
+                  config: {
+                     hint: true,
+                     highlight: true,
+                     minLength: 1
+                  },
+                  options: {
+                     name: 'states',
+                     source: substringMatcher(states)
+                  }
+               }
+            }
+         });
+         // $('.tags_1').tagsInput('addTag', 'asd111');
+         // console.log(i);
+         // var instance = $('.tags_1').data('tagsInput');
+         // instance.init2();
+         // console.log(instance);
+         console.warn($('.tags_1').tagsInput('items'));
+         // $('.tags_1').tagsInput('importTags', 'asdasd, asdasdasd; asdsds', {removeAll: true});
+         // $('.tags_1').tagsInput('importTags', 'asdasd, asdasdasd; asdsds');
+      });
+
+   </script>
+      <form style="height: 200px;">
+         <p><label>Defaults:</label>
+         <input type="text" class="tags tags_1" value="foo,bar,baz,roffle" /></p>
+         <input type="text" class="tags tags_2" /></p>
+      </form>

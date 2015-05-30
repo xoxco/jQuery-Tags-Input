@@ -14,7 +14,7 @@
       // Browser globals
       factory(root.jQuery);
    }
-}(this, function($, undefined) {
+}('tagsInput', function(undefined) {
    'use strict';
    var pluginName = 'tagsInput';
 
@@ -30,7 +30,18 @@
       elementData : {},
       itemsArray: [],
       config: {
-         tags: '.tag'
+         tags: '.tag',
+         events: {
+            click: 'click.tagsInput',
+            keypress: 'keypress.tagsInput',
+            keydown: 'keydown.tagsInput',
+            keyup: 'keyup.tagsInput',
+            focusin: 'focusin.tagsInput',
+            focusout: 'focusout.tagsInput',
+            blur: 'blur.tagsInput',
+            focus: 'focus.tagsInput',
+            change: 'change.tagsInput'
+         }
       },
       tagSource: 'user', // Where did the tag come from? [user, import, add, autocomplete]
       defaultOpts : {
@@ -63,6 +74,8 @@
             selectFirst: true
          },
 
+         plugins: {},
+
          // @TODO: Hooks
 
          // General Hooks
@@ -81,6 +94,16 @@
          afterRemoveTag: function() {}
       }
    };
+
+   // Sub-PLugins
+   PluginBase.plugins = {
+      JQueryUIAutocomplete: null,
+      Autocomplete: null,
+      TagSorter: null
+   };
+   // PluginBase.JQueryUIAutocomplete = null;
+   // PluginBase.Autocomplete = null;
+   // PluginBase.tagSorter = null;
 
    // =========================== Plugin Setup
    PluginBase.Setup = function() {
@@ -146,14 +169,16 @@
       };
 
       var _addTag = function(tagValue, options) {
+         var tagAdded = false;
+
          // Make sure we can add the new tag
          if (_maxTagsReached()) {
             // Only show an error state if we are adding a tag, not on import.
             // On import, we'll just drop the other tags silently
             if (Plugin.core.isInit === false) {
                _displayError();
+               return tagAdded;
             }
-            return false;
          }
 
          // Trim the new tag before continuing
@@ -176,11 +201,6 @@
             //    }
             // }
 
-            var tags = $(this).val().split(Plugin.opts.delimiterRegex);
-            if (tags[0] === '') {
-               tags = [];
-            }
-
             // Check for uniqueness if this option is enabled
             var skipTag = false;
             if (options.unique) {
@@ -189,6 +209,7 @@
                // Only show the error if we are not importing tags
                if (skipTag && Plugin.core.tagSource !== 'import') {
                   _displayError();
+                  return;
                }
             }
 
@@ -204,6 +225,7 @@
                   };
                }
 
+               // @TODO: Fix this
                var anchorTag = $('<a>', anchorTagAttrs).click(function(e) {
                   return methods['removeTag', id, escape(tagValue)];
                });
@@ -221,7 +243,7 @@
                   .insertBefore('#' + id + '_addTag');
 
                // Add the tag to the tag list
-               tags.push(tagValue);
+               Plugin.core.itemsArray.push(tagValue);
 
                // Clear the input box and set the focus based on the options
                $(Plugin.elementData.fakeInput).val('');
@@ -230,12 +252,14 @@
                } else {
                   $(Plugin.elementData.fakeInput).blur();
                }
+               // @TODO: Temp
+               $(Plugin.elementData.fakeInput).focus();
+               $(Plugin.elementData.fakeInput).val('');
 
                // Update the hidden tags field
-               _updateTagsField(tags);
+               _updateTagsField(Plugin.core.itemsArray);
 
-               // Set the tags array
-               Plugin.core.itemsArray = tags;
+               tagAdded = true;
 
                // @TODO: Callbacks
                // if (options.callback && tags_callbacks[id] && tags_callbacks[id]['onAddTag']) {
@@ -250,6 +274,8 @@
                // }
             }
          });
+
+         return tagAdded;
       };
 
       var _removeTag = function(tag, options) {
@@ -325,7 +351,7 @@
 
          // Compare the new tag against the existing tags
          if (Plugin.opts.caseSensitive) {
-            return ($.inArray(tag, Plugin.core.itemsArray) >= 0);
+            tagFound = ($.inArray(tag, Plugin.core.itemsArray) >= 0);
          } else {
             // Compare the lowercase new tag against the existing tags, all in lowercase
             $.each(Plugin.core.itemsArray, function(index, existingTag) {
@@ -404,17 +430,24 @@
       };
 
       var _checkDelimiter = function(e) {
-         if (e.which == 13) {
+         var found = false;
+         if (event.which == 13) {
             return true;
          }
 
-         for (var delimiter in Plugin.core.delimiter) {
-            if (e.which == delimiter.charCodeAt(0)) {
-               return true;
+         if (typeof Plugin.core.delimiter === 'string') {
+            if (event.which == Plugin.core.delimiter.charCodeAt(0)) {
+               found = true;
             }
+         } else {
+            $.each(Plugin.core.delimiter, function(index, delimiter) {
+               if (event.which == delimiter.charCodeAt(0)) {
+                  found = true;
+               }
+            });
          }
 
-         return false;
+         return found;
       };
 
       var _updateTagsField = function(tagsArray) {
@@ -452,12 +485,6 @@
          if (typeof Plugin.opts.afterImportTag === 'function') {
             Plugin.opts.afterImportTag.call(this, tag, Plugin.core.itemsArray, Plugin.core.tagSource);
          }
-      };
-
-      var _resetInput = function() {
-         var $fakeInput = $(Plugin.elementData.fakeInput);
-         $fakeInput.val( $fakeInput.attr('data-default') );
-         $fakeInput.css('color', Plugin.opts.placeholderColor);
       };
 
       var _doAutosize = function() {
@@ -564,9 +591,16 @@
             _importTags(realInputValue);
          }
 
+         // Initialize plugin extensions
+         $.each(Plugin.opts.plugins, function(pluginName) {
+            if (typeof PluginBase.plugins[pluginName] !== undefined) {
+               PluginBase.plugins[pluginName].init(Plugin);
+            }
+         });
+
          if (Plugin.opts.readOnly !== true) {
             // Set the default text and color
-            _resetInput();
+            Plugin.resetInput();
 
             // Setup the autosize listener
             _resetAutosize();
@@ -584,7 +618,7 @@
                Plugin.core.$fakeInput.css('color','#000000');
             });
 
-            Plugin.core.$fakeInput.bind('keypress', function(e) {
+            Plugin.core.$fakeInput.bind(Plugin.core.config.events.keypress, function(e) {
                var $self = $(this);
                var tag = $self.val();
                // Check if the character typed is a delimiter
@@ -597,7 +631,7 @@
                      _setTagSource('add');
 
                      // Add the tag
-                     _addTag(this, tag, {focus: true, unique: (Plugin.opts.unique)});
+                     _addTag(tag, {focus: true, unique: (Plugin.opts.unique)});
                      // $self.trigger('resetAutosize');
                      _resetAutosize();
                      // @TODO: Need to add this as a trigger in "listen"
@@ -622,7 +656,7 @@
             } else {
                // if a user tabs out of the field, create a new tag
                // this is only available if autocomplete is not used.
-               Plugin.core.$fakeInput.bind('blur', function(event) {
+               Plugin.core.$container.on(Plugin.core.config.events.blur, Plugin.core.$fakeInput, function(e) {
                   var $self = $(this);
                   var defaultText = $self.attr('data-default');
 
@@ -641,7 +675,7 @@
                      }
                   } else {
                      // Reset the default text and color
-                     _resetInput();
+                     Plugin.resetInput();
                   }
                   return false;
                });
@@ -649,7 +683,7 @@
 
             // Delete last tag on backspace
             if (Plugin.opts.removeWithBackspace) {
-               $(Plugin.elementData.fakeInput).bind('keydown', function(e) {
+               $(Plugin.elementData.fakeInput).bind(Plugin.core.config.events.keydown, function(e) {
                   // Remove the error class
                   // @TODO: Need to make sure that hitting keys such as shift, alt, control, etc...
                   // does not reset the error. Or is this overkill?
@@ -683,10 +717,17 @@
          } // End settings.readOnly
       };
 
-      Plugin.addTag = function(tags) {
+      Plugin.resetInput = function() {
+         var $fakeInput = $(Plugin.elementData.fakeInput);
+         $fakeInput.val( $fakeInput.attr('data-default') );
+         $fakeInput.css('color', Plugin.opts.placeholderColor);
+      };
+
+      Plugin.addTag = function(tag, source) {
+         source = source || 'add';
          // Set the tag source
-         _setTagSource('add');
-         _addTag(tags);
+         _setTagSource(source);
+         return _addTag(tag);
       };
 
       Plugin.removeTag = function(tag, options) {
@@ -711,7 +752,9 @@
          options = $.extend({
             unique: false,
             skipBeforeCallback: false,
+            skipBeforeAddCallback: false,
             skipAfterCallback: false,
+            skipAfterAddCallback: false,
             removeAll: false
          }, Plugin.opts, options);
 
@@ -728,9 +771,16 @@
             _removeAll();
          }
 
+         // Create options for add function
+         var addOptions = {
+            unique: options.unique,
+            skipBeforeCallback: options.skipBeforeAddCallback,
+            skipAfterCallback: options.skipAfterAddCallback
+         };
+
          // Import the tags one by one
          $.each(tags, function(index, tag) {
-            _addTag(tag, options);
+            _addTag(tag, addOptions);
          });
 
          // Call the "afterImportTags" callback
@@ -742,6 +792,10 @@
 
    $.fn.tagsInput = $.fn.tagsinput = function(methodOrOptions, methodArgs, methodOpts) {
       var results = [];
+
+      if (methodOrOptions === 'register') {
+         PluginBase.plugins[methodArgs] = new methodOpts();
+      }
 
       this.each(function() {
          // Use an existing plugin instance from the element if we have one. If not, create a new instance
