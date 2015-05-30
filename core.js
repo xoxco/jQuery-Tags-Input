@@ -202,14 +202,6 @@
 
          Plugin.core.$.each(function() {
             var id = Plugin.core.$.attr('id');
-            // Determine if we're trying to import a string of tags or an array
-            // if (typeof tags === 'string') {
-            //    // tags = Plugin.core.$.val().split(Plugin.opts.delimiterRegex);
-            //    tags = tags.split(Plugin.opts.delimiterRegex);
-            //    if (tags[0] === '') {
-            //       tags = [];
-            //    }
-            // }
 
             // Check for uniqueness if this option is enabled
             var skipTag = false;
@@ -270,18 +262,6 @@
                _updateTagsField(Plugin.core.itemsArray);
 
                tagAdded = true;
-
-               // @TODO: Callbacks
-               // if (options.callback && tags_callbacks[id] && tags_callbacks[id]['onAddTag']) {
-               //    var f = tags_callbacks[id]['onAddTag'];
-               //    f.call(this, tagValue);
-               // }
-               // if(tags_callbacks[id] && tags_callbacks[id]['onChange'])
-               // {
-               //    var i = tagslist.length;
-               //    var f = tags_callbacks[id]['onChange'];
-               //    f.call(this, $(this), tagslist[i-1]);
-               // }
             }
          });
 
