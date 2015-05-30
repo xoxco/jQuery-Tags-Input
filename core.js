@@ -171,14 +171,24 @@
       var _addTag = function(tagValue, options) {
          var tagAdded = false;
 
+         options = $.extend({
+            skipBeforeCallback: false,
+            skipAfterCallback: false
+         }, Plugin.opts, options);
+
+         // Call the "beforeAddTags" callback
+         if (options.skipBeforeCallback === false && Plugin.core.isInit === false) {
+            _beforeAddTagsCallback(tagValue);
+         }
+
          // Make sure we can add the new tag
          if (_maxTagsReached()) {
             // Only show an error state if we are adding a tag, not on import.
             // On import, we'll just drop the other tags silently
             if (Plugin.core.isInit === false) {
                _displayError();
-               return tagAdded;
             }
+            return tagAdded;
          }
 
          // Trim the new tag before continuing
@@ -274,6 +284,11 @@
                // }
             }
          });
+
+         // Call the "afterAddTags" callback
+         if (options.skipBeforeCallback === false && Plugin.core.isInit === false) {
+            _afterAddTagsCallback(tagValue);
+         }
 
          return tagAdded;
       };
@@ -469,9 +484,21 @@
          }
       };
 
-      var _afterRemoveTagsCallback = function(tag) {
-         if (typeof Plugin.opts.afterRemoveTag === 'function') {
-            Plugin.opts.afterRemoveTag.call(this, tag, Plugin.core.itemsArray, Plugin.core.tagSource);
+      var _afterImportTagsCallback = function(tag) {
+         if (typeof Plugin.opts.afterImportTag === 'function') {
+            Plugin.opts.afterImportTag.call(this, tag, Plugin.core.itemsArray, Plugin.core.tagSource);
+         }
+      };
+
+      var _beforeAddTagsCallback = function(tag) {
+         if (typeof Plugin.opts.beforeAddTag === 'function') {
+            Plugin.opts.beforeAddTag.call(this, tag, Plugin.core.itemsArray, Plugin.core.tagSource);
+         }
+      };
+
+      var _afterAddTagsCallback = function(tag) {
+         if (typeof Plugin.opts.afterAddTag === 'function') {
+            Plugin.opts.afterAddTag.call(this, tag, Plugin.core.itemsArray, Plugin.core.tagSource);
          }
       };
 
@@ -481,9 +508,9 @@
          }
       };
 
-      var _afterImportTagsCallback = function(tag) {
-         if (typeof Plugin.opts.afterImportTag === 'function') {
-            Plugin.opts.afterImportTag.call(this, tag, Plugin.core.itemsArray, Plugin.core.tagSource);
+      var _afterRemoveTagsCallback = function(tag) {
+         if (typeof Plugin.opts.afterRemoveTag === 'function') {
+            Plugin.opts.afterRemoveTag.call(this, tag, Plugin.core.itemsArray, Plugin.core.tagSource);
          }
       };
 
