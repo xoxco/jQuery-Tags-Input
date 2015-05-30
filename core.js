@@ -61,7 +61,7 @@
          caseSensitive: true,   // @TODO
 
          // UI
-         width: '300px',
+         width: '100%',
          height: '100px',
          hide: true,
          placeholderColor: '#666666',
@@ -400,7 +400,7 @@
          // Apply CSS options to the markup
          $(Plugin.core.elementData.holder).css('width', Plugin.opts.width);
          $(Plugin.core.elementData.holder).css('min-height', Plugin.opts.height);
-         $(Plugin.core.elementData.holder).css('height', '100%');
+         $(Plugin.core.elementData.holder).css('height', Plugin.opts.height);
       };
 
       var _updateDelimiterRegex = function() {
