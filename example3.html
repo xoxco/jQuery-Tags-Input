@@ -66,6 +66,13 @@
 
 
       $(function() {
+         $('.tags_1').on('jqti:before:add', function(args) {
+            window.setTimeout(function() {
+               args.cancel = true;
+            }, 1000);
+         });
+
+
          // $('.tags_2').typeahead(c.config, c.options);
          var i = $('.tags_1').tagsInput({
             readOnly: false,

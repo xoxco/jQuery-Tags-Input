@@ -2,6 +2,17 @@
  * Licensed under the MIT license
  */
 
+ /*
+   Events fired on the tags input field:
+      - jqti:after:init
+      - jqti:before:add
+      - jqti:after:add
+      - jqti:before:import
+      - jqti:after:import
+      - jqti:before:remove
+      - jqti:after:remove
+ */
+
 ;(function(root, factory) {
    if (typeof exports === 'object') {
       // CommonJS
@@ -20,6 +31,7 @@
 
    // Create our namespace
    var PluginBase = {};
+   PluginBase.plugins = {};
 
    // =========================== Plugin Core
    PluginBase.Core = {
@@ -48,7 +60,6 @@
          // Config
          defaultText: 'add a tag',
          minChars: 0,
-         // delimiter: [',', ';'],
          delimiter: [','],
          delimiterRegex: '/[\s,]+/',
          alphaNumRegex: /\w+|[áéíóúÁÉÍÓÚñÑ,/]+/,
@@ -57,8 +68,8 @@
          removeWithBackspace: true,
          readOnly: false,
          maxTags: null,
-         maxChars: null,   // @TODO
-         caseSensitive: true,   // @TODO
+         maxChars: null,
+         caseSensitive: true,
 
          // UI
          width: '100%',
@@ -76,8 +87,6 @@
 
          plugins: {},
 
-         // @TODO: Hooks
-
          // General Hooks
          afterInit: function() {},
 
@@ -94,16 +103,6 @@
          afterRemoveTag: function() {}
       }
    };
-
-   // Sub-PLugins
-   PluginBase.plugins = {
-      JQueryUIAutocomplete: null,
-      Autocomplete: null,
-      TagSorter: null
-   };
-   // PluginBase.JQueryUIAutocomplete = null;
-   // PluginBase.Autocomplete = null;
-   // PluginBase.tagSorter = null;
 
    // =========================== Plugin Setup
    PluginBase.Setup = function() {
@@ -168,6 +167,24 @@
          Plugin.core.tagSource = source;
       };
 
+      var _triggerEvent = function(eventName, args) {
+         var eventObject = {};
+         switch(eventName) {
+            case 'before:add':
+               args.cancel = false;
+               args.options = Plugin.opts;
+               args.items = Plugin.core.itemsArray;
+               eventObject = $.Event('jqti:before:add', args)
+            break;
+         }
+
+         // Trigger the event
+         Plugin.core.$realInput.trigger(eventObject);
+
+         // Return the results of the event function, if any
+         return eventObject;
+      };
+
       var _addTag = function(tagValue, options) {
          var tagAdded = false;
 
@@ -177,8 +194,14 @@
          }, Plugin.opts, options);
 
          // Call the "beforeAddTags" callback
+         var eventResult = true;
          if (options.skipBeforeCallback === false && Plugin.core.isInit === false) {
-            _beforeAddTagsCallback(tagValue);
+            eventResult = _triggerEvent('before:add', {tag: tagValue});
+            // _beforeAddTagsCallback(tagValue);
+
+            if (eventResult.cancel) {
+               return;
+            }
          }
 
          // Make sure we can add the new tag
@@ -192,9 +215,9 @@
          }
 
          // Trim the new tag before continuing
-         tagValue = jQuery.trim(tagValue);
+         tagValue = $.trim(tagValue);
 
-         options = jQuery.extend({
+         options = $.extend({
             focus: false,
             callback: false,
             unique: false
@@ -502,7 +525,6 @@
          var input = $fakeInput;
          var testSubject = $('#' + $fakeInput.data('tester_id'));
 
-
          if (val === (val = input.val())) {return;}
 
          // Enter new content into testSubject
@@ -571,7 +593,7 @@
          var id = _generateId();
 
          // Create the delimiter data object
-         Plugin.elementData = jQuery.extend({
+         Plugin.elementData = $.extend({
             pid            : id,
             realInput      : '#' + id,
             container      : '#' + id + '_tagsinput',
@@ -639,18 +661,14 @@
 
                      // Add the tag
                      _addTag(tag, {focus: true, unique: (Plugin.opts.unique)});
-                     // $self.trigger('resetAutosize');
                      _resetAutosize();
-                     // @TODO: Need to add this as a trigger in "listen"
                   } else {
                      // Tag is too short or too long
                      _displayError();
                   }
                   return false;
                } else if (Plugin.opts.autosize) {
-                  // Plugin.core.$fakeInput.trigger('resetAutosize');
                   _doAutosize();
-                     // @TODO: Need to add this as a trigger in "listen"
                }
             });
 
