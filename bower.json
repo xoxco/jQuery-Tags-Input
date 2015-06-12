@@ -1,6 +1,5 @@
 {
   "name": "jquery.tagsinput",
-  "version": "1.3.5",
   "main": ["src/jquery.tagsinput.js", "src/jquery.tagsinput.css"],
   "ignore": [
     "**/.*",
